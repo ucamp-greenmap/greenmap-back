@@ -71,12 +71,12 @@ public class NewsServiceImpl implements NewsService{
             }
 
             for (NewsResponse.NewsItem item : newsList) {
-                if (newsRepository.existsByNewsTitleAndMember_MemberId("Seoul increases bike lanes", 2L)) {
+                if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), 1L)) {
                     item.setRead(true);
                 }
             }
 
-            return ResponseEntity.ok(ApiResponse.success("성공", newsResponse));
+            return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스 목록을 조회했습니다.", newsResponse));
 
         } catch (RuntimeException e) {
             log.info("error catched : " + e.getMessage());

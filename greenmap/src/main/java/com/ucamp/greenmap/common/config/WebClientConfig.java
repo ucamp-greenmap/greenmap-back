@@ -24,22 +24,9 @@ public class WebClientConfig {
     @Bean
     public WebClient naverWebClient() throws SSLException {
 
-        WebClient.Builder builder = WebClient.builder()
+        return WebClient.builder()
                 .baseUrl(naverUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-
-        // 개발 환경에서만 SSL 검증 비활성화
-
-        SslContext sslContext = SslContextBuilder
-                .forClient()
-                .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
-
-        HttpClient httpClient = HttpClient.create()
-                .secure(sslContextSpec -> sslContextSpec.sslContext(sslContext));
-
-        builder.clientConnector(new ReactorClientHttpConnector(httpClient));
-
-        return builder.build();
     }
 }
