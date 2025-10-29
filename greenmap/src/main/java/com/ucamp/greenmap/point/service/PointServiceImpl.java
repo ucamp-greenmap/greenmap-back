@@ -7,7 +7,9 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.domain.Voucher;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
+import com.ucamp.greenmap.point.dto.response.ShopInfoDto;
 import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
+import com.ucamp.greenmap.point.dto.response.VoucherDto;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.repository.VoucherRepository;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -96,5 +99,22 @@ public class PointServiceImpl implements PointService {
                 .carbon_save(point.getCarbonSaveTotal())
                 .point(point.getPoint())
                 .build();
+    }
+
+    @Override
+    public ShopInfoDto getShopInfo(Long memberId) {
+        Point point = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
+
+        // 1) 바우처 엔티티 조회
+        List<Voucher> vouchers = voucherRepository.findAll();
+
+        // 2) 바우처 DTO 변환
+        List<VoucherDto> voucherList = vouchers.stream()
+                .map(VoucherDto::fromEntity)
+                .toList();
+
+        // 3) ShopInfoDto 생성 및 반환
+        return ShopInfoDto.of(point.getPoint(), voucherList);
     }
 }
