@@ -67,8 +67,7 @@ public class PointServiceImpl implements PointService {
         }
 
         // 3) 잔액/사용 누적 반영
-        point.changePoint(beforePoint - usedPoint);
-        point.updateUsedPoint(point.getUsedPoint() + usedPoint);
+        point.usePoint(usedPoint);
 
         // 4) 카테고리 조회
         Category category = categoryRepository.findByCategoryName(catName)
