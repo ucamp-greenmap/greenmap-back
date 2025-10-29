@@ -44,6 +44,8 @@ dependencies {
     // 이미 있다면 중복 추가 X
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 }
 
 tasks.named('test') {
