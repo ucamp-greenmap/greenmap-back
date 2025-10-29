@@ -35,6 +35,6 @@ public class PointHistory extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "log_id", nullable = false)
+    @Column(name = "log_id")
     private Long logId;
 }
