@@ -13,19 +13,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "gifticon")
-public class Gifticon extends BaseEntity {
+@Table(name = "voucher")
+public class Voucher extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "gift_id")
-    private Long giftId;
+    @Column(name = "voucher_id")
+    private Long voucherId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", nullable = false)
     private Image image;
 
     @Column(name = "price", nullable = false)
-    private Integer price;
+    private Long price;
 
     @Column(name = "name", nullable = false)
     private String name;

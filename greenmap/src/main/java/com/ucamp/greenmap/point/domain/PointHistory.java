@@ -30,11 +30,11 @@ public class PointHistory extends BaseEntity {
     private Category category;
 
     @Column(name = "point_amount", nullable = false)
-    private Integer pointAmount;
+    private Long pointAmount;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "log_id", nullable = false)
+    @Column(name = "log_id")
     private Long logId;
 }
