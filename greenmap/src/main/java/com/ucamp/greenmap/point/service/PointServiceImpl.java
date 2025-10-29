@@ -7,9 +7,7 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.domain.Voucher;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
-import com.ucamp.greenmap.point.dto.response.ShopInfoDto;
-import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
-import com.ucamp.greenmap.point.dto.response.VoucherDto;
+import com.ucamp.greenmap.point.dto.response.*;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.repository.VoucherRepository;
@@ -116,5 +114,24 @@ public class PointServiceImpl implements PointService {
 
         // 3) ShopInfoDto 생성 및 반환
         return ShopInfoDto.of(point.getPoint(), voucherList);
+    }
+
+    @Override
+    public UsedPointLogResponse getUsedPointLogs(Long memberId) {
+
+        List<PointHistory> histories = pointHistoryRepository.findTop5ByMember_MemberIdOrderByCreatedAtDesc(memberId);
+
+        List<UsedPointLog> usedPointLogs = histories.stream()
+                .map(history -> UsedPointLog.builder()
+                        .pointAmount(history.getPointAmount())
+                        .description(history.getDescription())
+                        .date(history.getCreatedAt())
+                        .category(null) // 사용 로그는 카테고리 정보가 필요 없으므로 null 처리
+                        .build())
+                .toList();
+        return UsedPointLogResponse.builder()
+                .usedLogs(usedPointLogs)
+                .memberId(memberId)
+                .build();
     }
 }
