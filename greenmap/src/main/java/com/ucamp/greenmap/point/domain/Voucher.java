@@ -25,7 +25,7 @@ public class Voucher extends BaseEntity {
     private Image image;
 
     @Column(name = "price", nullable = false)
-    private Integer price;
+    private Long price;
 
     @Column(name = "name", nullable = false)
     private String name;
