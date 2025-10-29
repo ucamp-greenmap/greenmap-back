@@ -4,6 +4,7 @@ import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.ShopInfoDto;
 import com.ucamp.greenmap.point.dto.response.UsePointResponse;
+import com.ucamp.greenmap.point.dto.response.UsedPointLogResponse;
 import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
 import com.ucamp.greenmap.point.service.PointService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,13 @@ public class PointController {
     public ResponseEntity<ApiResponse<ShopInfoDto>> getShopInfo() {
         Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
         ShopInfoDto response = pointService.getShopInfo(memberId);
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+
+    @GetMapping("/used")
+    public ResponseEntity<ApiResponse<UsedPointLogResponse>> getUsedPointLogs() {
+        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+        UsedPointLogResponse response = pointService.getUsedPointLogs(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
