@@ -7,6 +7,7 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.domain.Voucher;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
+import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.repository.VoucherRepository;
@@ -85,5 +86,15 @@ public class PointServiceImpl implements PointService {
         pointHistoryRepository.save(history);
 
         return usedPoint;
+    }
+
+    @Override
+    public UserInfoResponse getPointInfo(Long memberId) {
+        Point point = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
+        return UserInfoResponse.builder()
+                .carbon_save(point.getCarbonSaveTotal())
+                .point(point.getPoint())
+                .build();
     }
 }

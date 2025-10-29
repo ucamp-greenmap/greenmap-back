@@ -11,4 +11,6 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
     @Query("select p from Point p join fetch p.member m where m.memberId = :memberId")
     Optional<Point> findByMemberIdForUpdate(@Param("memberId") Long memberId);
+
+    Optional<Point> findByMember_MemberId(Long memberId);
 }
