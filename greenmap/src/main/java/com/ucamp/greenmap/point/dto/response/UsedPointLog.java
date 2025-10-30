@@ -11,5 +11,5 @@ public class UsedPointLog {
     private String description;
     private Long pointAmount;
     private LocalDateTime date;
-    private Long category;
+    private String category;
 }

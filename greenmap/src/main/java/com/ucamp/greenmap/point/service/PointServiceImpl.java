@@ -162,4 +162,45 @@ public class PointServiceImpl implements PointService {
                 .ranks(ranks)
                 .build();
     }
+
+    @Override
+    public UserPointInfo getUserPointInfo(Long memberId) {
+
+        Point point = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
+
+        List<PointHistory> histories = pointHistoryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+
+        List<UsedPointLog> usedPointLogs = histories.stream()
+                .map(history -> {
+                    Long categoryId = history.getCategory().getCategoryId();
+
+                    String categoryName;
+                    if (categoryId == 9L) {
+                        categoryName = "챌린지";
+                    } else if (categoryId == 5L) {
+                        categoryName = "뉴스";
+                    } else if (categoryId == 6L || categoryId == 7L) {
+                        categoryName = "교환";
+                    } else {
+                        categoryName = "인증";
+                    }
+
+                    return UsedPointLog.builder()
+                            .pointAmount(history.getPointAmount())
+                            .description(history.getDescription())
+                            .date(history.getCreatedAt())
+                            .category(categoryName)
+                            .build();
+                })
+                .toList();
+
+
+        return UserPointInfo.builder()
+                .memberId(memberId)
+                .getPoint(point.getWholePoint())
+                .usedPoint(point.getUsedPoint())
+                .logs(usedPointLogs)
+                .build();
+    }
 }
