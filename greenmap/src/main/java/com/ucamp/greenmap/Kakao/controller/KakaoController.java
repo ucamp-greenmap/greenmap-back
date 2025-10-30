@@ -2,35 +2,31 @@ package com.ucamp.greenmap.Kakao.controller;
 
 import com.ucamp.greenmap.Kakao.Service.KakaoService;
 import com.ucamp.greenmap.Kakao.response.LoginResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import java.util.NoSuchElementException;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
-@Api(tags = {"유저 API"})
-public class KakaoController{
+@RequestMapping("/api/users/login/oauth")
+public class KakaoController {
 
     private final KakaoService kakaoService;
 
-    //web 버전
-    @ResponseBody
-    @GetMapping("/login/oauth/kakao")
-    @ApiOperation(value = "웹 카카오 로그인", notes = "웹 프론트 버전 카카오 로그인")
-    public ResponseEntity<LoginResponse> kakaoLogin(@RequestParam String code, HttpServletRequest request) {
-        try {
-            // 현재 도메인 확인
-            String currentDomain = request.getServerName();
-            return ResponseEntity.ok(kakaoService.kakaoLogin(code, currentDomain));
-        } catch (NoSuchElementException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item Not Found");
-        }
+    @GetMapping("/start")
+    public void redirectToKakao(HttpServletResponse response) throws IOException {
+        String kakaoAuthUrl = kakaoService.getKakaoLoginUrl();
+        response.sendRedirect(kakaoAuthUrl);
     }
+
+    @GetMapping("/kakao")
+    public LoginResponse kakaoCallback(@RequestParam("code") String code) {
+        System.out.println("인가 코드 수신: " + code);
+        return kakaoService.kakaoLogin(code, "local");
+    }
+
 }
+
