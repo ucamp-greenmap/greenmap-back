@@ -7,6 +7,7 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.verification.domain.Validate;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
+import com.ucamp.greenmap.verification.dto.response.VerificationHistoryResponse;
 import com.ucamp.greenmap.verification.repository.ValidateRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.place.domain.Place;
@@ -22,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -197,6 +200,22 @@ public class VerificationServiceImpl implements VerificationService{
         return VerificationResponse.builder()
                 .point(pointAmount)
                 .carbonSave(carbonSave)
+                .build();
+    }
+
+    @Override
+    public VerificationHistoryResponse getVerificationHistory(Long memberId) {
+        List<History> historyList = historyRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+        List<VerificationHistoryResponse.VerificationHistoryItem> verificationHistoryItems = new ArrayList<>();
+        for (History history : historyList) {
+            verificationHistoryItems.add(VerificationHistoryResponse.VerificationHistoryItem.builder()
+                    .category(history.getCategory().getCategoryName().toString())
+                    .createdAt(history.getCreatedAt().toString())
+                    .point(history.getCarbonSave())
+                    .build());
+        }
+        return VerificationHistoryResponse.builder()
+                .historyItems(verificationHistoryItems)
                 .build();
     }
 }

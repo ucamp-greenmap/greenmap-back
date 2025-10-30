@@ -11,4 +11,6 @@ import java.util.List;
 public interface HistoryRepository extends JpaRepository<History, Long> {
     @Query("select h.historyId, coalesce(h.carbonSave, 0) from History h where h.historyId in :ids")
     List<HistoryCarbonDto> findCarbonByIds(@Param("ids") List<Long> ids);
+
+    List<History> findByMember_MemberIdOrderByCreatedAtDesc(Long memberId);
 }
