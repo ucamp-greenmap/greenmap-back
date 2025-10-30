@@ -45,12 +45,12 @@ public class Point extends BaseEntity {
     @Column(name = "whole_point_times", nullable = false)
     private Long wholePointTimes;
 
-    public void getPoint(Long getPoint) {
+    public void addPoint(Long getPoint) {
         this.point += getPoint;
         this.monthPoint += getPoint;
         this.wholePoint += getPoint;
-
     }
+
     public void usePoint(Long usedPoint) {
         this.usedPoint += usedPoint;
         this.point -= usedPoint;
