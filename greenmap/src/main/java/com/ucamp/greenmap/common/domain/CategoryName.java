@@ -7,5 +7,7 @@ public enum CategoryName {
     RECYCLING_CENTER,
     NEWS,
     CHALLENGE,
-    USE_POINT
+    CASH,
+    VOUCHER,
+    BOOKMARK
 }

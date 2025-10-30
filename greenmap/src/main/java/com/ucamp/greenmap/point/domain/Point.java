@@ -25,23 +25,34 @@ public class Point extends BaseEntity {
     private Member member;
 
     @Column(name = "point", nullable = false)
-    private Integer point;
+    private Long point;
 
     @Column(name = "month_point", nullable = false)
-    private Integer monthPoint;
+    private Long monthPoint;
 
     @Column(name = "used_point", nullable = false)
-    private Integer usedPoint;
+    private Long usedPoint;
 
     @Column(name = "whole_point", nullable = false)
-    private Integer wholePoint;
+    private Long wholePoint;
 
     @Column(name = "carbon_save_total", nullable = false)
-    private Integer carbonSaveTotal;
+    private Long carbonSaveTotal;
 
     @Column(name = "point_times", nullable = false)
-    private Integer pointTimes;
+    private Long pointTimes;
 
     @Column(name = "whole_point_times", nullable = false)
-    private Integer wholePointTimes;
+    private Long wholePointTimes;
+
+    public void addPoint(Long getPoint) {
+        this.point += getPoint;
+        this.monthPoint += getPoint;
+        this.wholePoint += getPoint;
+    }
+
+    public void usePoint(Long usedPoint) {
+        this.usedPoint += usedPoint;
+        this.point -= usedPoint;
+    }
 }
