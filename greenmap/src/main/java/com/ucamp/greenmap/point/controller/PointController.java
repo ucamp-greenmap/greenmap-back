@@ -2,10 +2,7 @@ package com.ucamp.greenmap.point.controller;
 
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
-import com.ucamp.greenmap.point.dto.response.ShopInfoDto;
-import com.ucamp.greenmap.point.dto.response.UsePointResponse;
-import com.ucamp.greenmap.point.dto.response.UsedPointLogResponse;
-import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
+import com.ucamp.greenmap.point.dto.response.*;
 import com.ucamp.greenmap.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +43,13 @@ public class PointController {
     public ResponseEntity<ApiResponse<UsedPointLogResponse>> getUsedPointLogs() {
         Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
         UsedPointLogResponse response = pointService.getUsedPointLogs(memberId);
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<ApiResponse<RankingResponse>> getRanking(){
+        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+        RankingResponse response = pointService.getRanking(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
