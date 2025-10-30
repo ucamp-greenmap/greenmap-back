@@ -19,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class History extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "record_id")
-    private Long recordId;
+    @Column(name = "history_id")
+    private Long historyId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "place_id")
@@ -35,14 +35,14 @@ public class History extends BaseEntity {
     private Category category;
 
     @Column(name = "charge_amount")
-    private Integer chargeAmount;
+    private Long chargeAmount;
 
     @Column(name = "purchase_amount")
-    private Integer purchaseAmount;
+    private Long purchaseAmount;
 
     @Column(name = "distance")
-    private Integer distance;
+    private Long distance;
 
     @Column(name = "carbon_save")
-    private Integer carbonSave;
+    private Long carbonSave;
 }
