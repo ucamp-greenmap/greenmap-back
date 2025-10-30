@@ -2,9 +2,11 @@ package com.ucamp.greenmap.Kakao.controller;
 
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+@CrossOrigin(origins = "http://localhost:5173")
 public class CustomErrorController implements ErrorController {
 
     @RequestMapping("/error")
