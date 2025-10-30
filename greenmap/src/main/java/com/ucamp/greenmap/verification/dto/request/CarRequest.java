@@ -6,6 +6,7 @@ import lombok.Getter;
 public class CarRequest {
     private String category;
     private Long chargeAmount;
+    private Long chargeFee;
     private String start_time;
     private String end_time;
 }

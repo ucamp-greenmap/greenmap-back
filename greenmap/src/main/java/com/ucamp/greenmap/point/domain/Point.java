@@ -49,6 +49,12 @@ public class Point extends BaseEntity {
         this.point += getPoint;
         this.monthPoint += getPoint;
         this.wholePoint += getPoint;
+        this.pointTimes += 1;
+        this.wholePointTimes += 1;
+    }
+
+    public void addCarbonSaveTotal(Long carbonSave) {
+        this.carbonSaveTotal += carbonSave;
     }
 
     public void usePoint(Long usedPoint) {
