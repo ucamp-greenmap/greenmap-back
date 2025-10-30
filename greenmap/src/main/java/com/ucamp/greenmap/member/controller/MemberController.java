@@ -16,12 +16,21 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PutMapping("/member")
+    @PutMapping
     public ResponseEntity<ApiResponse<MemberResponse>> deleteUser(@RequestBody MemberRequest request){
-        Long memberId= 1L;
+        Long memberId= request.getMemberId();
         MemberResponse response = memberService.deleteUser(request, memberId);
         return ResponseEntity.ok(ApiResponse.success("성공",response));
     }
+
+//    @PutMapping
+//    public ResponseEntity<ApiResponse<MemberResponse>> updateUser(@RequestBody MemberRequest request){
+//        Long memberId= request.getMemberId();
+//        MemberResponse response = memberService.deleteUser(request, memberId);
+//        return ResponseEntity.ok(ApiResponse.success("성공",response));
+//    }
+
+
 
 
 }
