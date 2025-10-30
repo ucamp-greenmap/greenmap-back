@@ -115,7 +115,14 @@ public class NewsServiceImpl implements NewsService {
     public ResponseEntity<ApiResponse<String>> viewNews(NewsRequest request) {
 
         try {
-            Member member = new Member(1L, new Image(1L, "url"), "email", "nickname", "password");
+            Member member = Member.builder()
+                    .memberId(1L)
+                    .image(new Image(1L, "url"))
+                    .email("email")
+                    .nickname("nickname")
+                    .password("password")
+                    .build();
+
             Category category = new Category(1L, CategoryName.NEWS);
             NewsViewLog log = NewsViewLog.builder()
                     .member(member)
