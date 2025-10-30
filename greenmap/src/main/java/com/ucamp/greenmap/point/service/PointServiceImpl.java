@@ -11,6 +11,7 @@ import com.ucamp.greenmap.point.dto.response.*;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.repository.VoucherRepository;
+import com.ucamp.greenmap.verification.repository.HistoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class PointServiceImpl implements PointService {
     private final VoucherRepository voucherRepository;
     private final CategoryRepository categoryRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final HistoryRepository historyRepository;
 
     @Override
     @Transactional
@@ -201,6 +203,37 @@ public class PointServiceImpl implements PointService {
                 .getPoint(point.getWholePoint())
                 .usedPoint(point.getUsedPoint())
                 .logs(usedPointLogs)
+                .build();
+    }
+
+    @Override
+    public CarbonInfoResponse getCarbonInfo(Long memberId) {
+        List<PointHistory> histories =
+                pointHistoryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+
+        long car = 0L, recycle = 0L, bike = 0L, zero = 0L;
+
+        for (PointHistory ph : histories) {
+            Long catId = ph.getCategory().getCategoryId();
+            Long logId = ph.getLogId();
+            if (logId == null) continue;
+
+            Long saved = historyRepository.getCarbonSaveByHistoryId(logId);
+
+            switch (catId != null ? catId.intValue() : -1) {
+                case 1 -> bike += saved; // 따릉이
+                case 2 -> zero += saved; // 제로웨이스트
+                case 3 -> car += saved; // EV/수소차
+                case 4 -> recycle += saved; // 재활용센터
+                default -> { /* 무시 */ }
+            }
+        }
+        return CarbonInfoResponse.builder()
+                .carbonSave(car + recycle + bike + zero)
+                .car(car)
+                .recycle(recycle)
+                .bike(bike)
+                .zero(zero)
                 .build();
     }
 }

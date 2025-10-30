@@ -16,4 +16,6 @@ public interface PointService {
     RankingResponse getRanking(Long memberId);
 
     UserPointInfo getUserPointInfo(Long memberId);
+
+    CarbonInfoResponse getCarbonInfo(Long memberId);
 }
