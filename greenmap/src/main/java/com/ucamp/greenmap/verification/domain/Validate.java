@@ -1,5 +1,6 @@
-package com.ucamp.greenmap.common.domain;
+package com.ucamp.greenmap.verification.domain;
 
+import com.ucamp.greenmap.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
