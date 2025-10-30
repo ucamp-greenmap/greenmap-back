@@ -2,11 +2,13 @@ package com.ucamp.greenmap.news.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@Builder
 public class NewsResponse {
     private String lastBuildDate;
     private List<NewsItem> items;

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -120,6 +121,7 @@ public class NewsServiceImpl implements NewsService {
                     .member(member)
                     .newsTitle(request.getTitle())
                     .build();
+            log.setCreatedAt(LocalDateTime.now());
 
             newsRepository.save(log);
 
@@ -132,6 +134,8 @@ public class NewsServiceImpl implements NewsService {
                     .description("description")
                     .logId(newsViewLog.getLogId())
                     .build();
+
+            pointHistory.setCreatedAt(LocalDateTime.now());
 
             pointHistoryRepository.save(pointHistory);
 
