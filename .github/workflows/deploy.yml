@@ -66,7 +66,7 @@ jobs:
                     --max-instances 10 \
                     --port 8080 \
                     --timeout 300 \
-                    --startup-cpu-boost
+                    --cpu-boost
 
             - name: 배포 결과 출력
               run: |
