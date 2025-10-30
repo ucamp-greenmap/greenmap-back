@@ -83,7 +83,13 @@ public class NewsServiceImpl implements NewsService {
                     .bodyToMono(NewsResponse.class)
                     .block();
 
-            List<NewsResponse.NewsItem> newsList = newsResponse.getItems();
+
+            List<NewsResponse.NewsItem> newsList = null;
+            try {
+                newsList = newsResponse.getItems();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
             while (newsList.size() > 4) {
                 newsList.removeLast();
@@ -107,31 +113,36 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public ResponseEntity<ApiResponse<String>> viewNews(NewsRequest request) {
 
-        Member member = new Member(1L, new Image(1L, "url"), "email", "nickname", "password");
-        Category category = new Category(1L, CategoryName.NEWS);
-        NewsViewLog log = NewsViewLog.builder()
-                .member(member)
-                .newsTitle(request.getTitle())
-                .build();
+        try {
+            Member member = new Member(1L, new Image(1L, "url"), "email", "nickname", "password");
+            Category category = new Category(1L, CategoryName.NEWS);
+            NewsViewLog log = NewsViewLog.builder()
+                    .member(member)
+                    .newsTitle(request.getTitle())
+                    .build();
 
-        newsRepository.save(log);
+            newsRepository.save(log);
 
-        NewsViewLog newsViewLog = newsRepository.findByNewsTitleAndMember_MemberId(request.getTitle(), member.getMemberId());
+            NewsViewLog newsViewLog = newsRepository.findByNewsTitleAndMember_MemberId(request.getTitle(), member.getMemberId());
 
-        PointHistory pointHistory = PointHistory.builder()
-                .member(member)
-                .category(category)
-                .pointAmount(5L)
-                .description("description")
-                .logId(newsViewLog.getLogId())
-                .build();
+            PointHistory pointHistory = PointHistory.builder()
+                    .member(member)
+                    .category(category)
+                    .pointAmount(5L)
+                    .description("description")
+                    .logId(newsViewLog.getLogId())
+                    .build();
 
-        pointHistoryRepository.save(pointHistory);
+            pointHistoryRepository.save(pointHistory);
 
-        Point point = pointRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
-        point.addPoint(5L);
+            Point point = pointRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
+            point.addPoint(5L);
 
-        return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));
+            return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));
+        } catch (Exception e) {
+            log.error("error catched : " + e.getMessage());
+            return ResponseEntity.ok(ApiResponse.error("실패"));
+        }
     }
 
     private String removeHtmlTags(String text) {
