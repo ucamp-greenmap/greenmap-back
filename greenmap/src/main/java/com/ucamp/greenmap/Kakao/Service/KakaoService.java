@@ -132,7 +132,7 @@ public class KakaoService {
         String email = (String) userInfo.get("email");
         String nickname = (String) userInfo.get("nickname");
 
-        String defaultImageUrl = "https://k.kakaocdn.net/dn/ctZm0O/dJMb9YcbUcZ/RWu8I9jWqAf3dfuwOoZnhk/img_640x640.jpg";
+        String defaultImageUrl = "https://em-content.zobj.net/thumbs/120/apple/325/leaf-fluttering-in-wind_1f343.png";
 
         // 🔹 DB 조회
         Member kakaoUser = userRepository.findByEmail(email).orElse(null);
