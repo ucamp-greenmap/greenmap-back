@@ -133,4 +133,33 @@ public class PointServiceImpl implements PointService {
                 .memberId(memberId)
                 .build();
     }
+
+    @Override
+    public RankingResponse getRanking(Long memberId) {
+        Point memberPoint = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
+
+        List<Point> topRanks = pointRepository.findTop10ByOrderByPointDesc();
+
+        List<Ranking> ranks = topRanks.stream()
+                .map(point -> Ranking.builder()
+                        .memberId(point.getMember().getMemberId())
+                        .nickname(point.getMember().getNickname())
+                        .point(point.getPoint())
+                        .carbonSave(point.getCarbonSaveTotal())
+                        .imageUrl(point.getMember().getImage().getImageUrl())
+                        .build())
+                .toList();
+
+
+        return RankingResponse.builder()
+                .memberId(memberId)
+                .nickname(memberPoint.getMember().getNickname())
+                .memberPoint(memberPoint.getPoint())
+                .carbonSave(memberPoint.getCarbonSaveTotal())
+                .imageUrl(memberPoint.getMember().getImage().getImageUrl())
+                .rank(pointRepository.countByPointGreaterThan(memberPoint.getPoint()) + 1)
+                .ranks(ranks)
+                .build();
+    }
 }
