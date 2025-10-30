@@ -15,7 +15,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/users/login/oauth/start",  // 로그인 시작 경로
-                                "/api/users/login/oauth/kakao"   // 카카오 콜백 경로
+                                "/api/users/login/oauth/kakao",   // 카카오 콜백 경로
+                                "/**"
                         ).permitAll()  // /error 경로도 허용
                         .anyRequest().authenticated()  // 나머지 요청은 인증 필요
                 )
