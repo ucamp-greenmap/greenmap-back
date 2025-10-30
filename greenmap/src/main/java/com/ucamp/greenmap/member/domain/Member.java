@@ -6,7 +6,7 @@ import lombok.*;
 
 import com.ucamp.greenmap.image.domain.*;
 
-
+@Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,4 +31,8 @@ public class Member extends BaseEntity {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    // 카카오 ID
+    private Long kakaoId;
+
 }
