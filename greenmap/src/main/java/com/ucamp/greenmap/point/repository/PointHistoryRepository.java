@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
     List<PointHistory> findTop5ByMember_MemberIdOrderByCreatedAtDesc(Long memberId);
+
+    List<PointHistory> findByMember_MemberIdOrderByCreatedAtDesc(Long memberId);
 }

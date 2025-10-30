@@ -53,4 +53,11 @@ public class PointController {
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<UserPointInfo>> getUserPointInfo() {
+        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+        UserPointInfo response = pointService.getUserPointInfo(memberId);
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+
 }
