@@ -8,9 +8,11 @@ import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.domain.Voucher;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.*;
+import com.ucamp.greenmap.point.enums.Type;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.repository.VoucherRepository;
+import com.ucamp.greenmap.verification.dto.response.HistoryCarbonDto;
 import com.ucamp.greenmap.verification.repository.HistoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -166,27 +171,28 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public UserPointInfo getUserPointInfo(Long memberId) {
+    public UserPointInfo getUserPointInfo(Long memberId, Type type) {
 
         Point point = pointRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
 
-        List<PointHistory> histories = pointHistoryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+        List<PointHistory> histories = switch (type) {
+            case Used -> pointHistoryRepository
+                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(6L, 7L));
+            case Get -> pointHistoryRepository
+                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(1L, 2L, 3L, 4L, 5L, 8L));
+            case All -> pointHistoryRepository
+                    .findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+        };
 
         List<UsedPointLog> usedPointLogs = histories.stream()
                 .map(history -> {
-                    Long categoryId = history.getCategory().getCategoryId();
-
-                    String categoryName;
-                    if (categoryId == 9L) {
-                        categoryName = "챌린지";
-                    } else if (categoryId == 5L) {
-                        categoryName = "뉴스";
-                    } else if (categoryId == 6L || categoryId == 7L) {
-                        categoryName = "교환";
-                    } else {
-                        categoryName = "인증";
-                    }
+                    String categoryName = switch (history.getCategory().getCategoryId().intValue()) {
+                        case 9 -> "챌린지";
+                        case 5 -> "뉴스";
+                        case 6, 7 -> "교환";
+                        default -> "인증";
+                    };
 
                     return UsedPointLog.builder()
                             .pointAmount(history.getPointAmount())
@@ -211,14 +217,30 @@ public class PointServiceImpl implements PointService {
         List<PointHistory> histories =
                 pointHistoryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
 
+        // 1) logId 수집 (null 제거)
+        List<Long> logIds = histories.stream()
+                .map(PointHistory::getLogId)
+                .filter(Objects::nonNull) // logId가 null인 경우 -> 포인트 사용 내역이므로 제외
+                .distinct()
+                .toList();
+
+        // 2) 한 번의 쿼리로 carbonSave 로딩 → Map<Long historyId, Long carbonSave>
+        List<HistoryCarbonDto> carbonList = historyRepository.findCarbonByIds(logIds);
+        Map<Long, Long> carbonMap = carbonList.stream()
+                .collect(Collectors.toMap(
+                        HistoryCarbonDto::getHistoryId,
+                        dto -> dto.getCarbonSave() != null ? dto.getCarbonSave() : 0L
+                ));
+
         long car = 0L, recycle = 0L, bike = 0L, zero = 0L;
 
+        // 3) 합산
         for (PointHistory ph : histories) {
-            Long catId = ph.getCategory().getCategoryId();
             Long logId = ph.getLogId();
             if (logId == null) continue;
 
-            Long saved = historyRepository.getCarbonSaveByHistoryId(logId);
+            Long saved = carbonMap.getOrDefault(logId, 0L);
+            Long catId = ph.getCategory() != null ? ph.getCategory().getCategoryId() : null;
 
             switch (catId != null ? catId.intValue() : -1) {
                 case 1 -> bike += saved; // 따릉이
