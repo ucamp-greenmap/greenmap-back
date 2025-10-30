@@ -8,6 +8,7 @@ import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.domain.Voucher;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.*;
+import com.ucamp.greenmap.point.enums.Type;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.repository.VoucherRepository;
@@ -170,27 +171,28 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public UserPointInfo getUserPointInfo(Long memberId) {
+    public UserPointInfo getUserPointInfo(Long memberId, Type type) {
 
         Point point = pointRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
 
-        List<PointHistory> histories = pointHistoryRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+        List<PointHistory> histories = switch (type) {
+            case Used -> pointHistoryRepository
+                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(6L, 7L));
+            case Get -> pointHistoryRepository
+                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(1L, 2L, 3L, 4L, 5L, 8L));
+            case All -> pointHistoryRepository
+                    .findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+        };
 
         List<UsedPointLog> usedPointLogs = histories.stream()
                 .map(history -> {
-                    Long categoryId = history.getCategory().getCategoryId();
-
-                    String categoryName;
-                    if (categoryId == 9L) {
-                        categoryName = "챌린지";
-                    } else if (categoryId == 5L) {
-                        categoryName = "뉴스";
-                    } else if (categoryId == 6L || categoryId == 7L) {
-                        categoryName = "교환";
-                    } else {
-                        categoryName = "인증";
-                    }
+                    String categoryName = switch (history.getCategory().getCategoryId().intValue()) {
+                        case 9 -> "챌린지";
+                        case 5 -> "뉴스";
+                        case 6, 7 -> "교환";
+                        default -> "인증";
+                    };
 
                     return UsedPointLog.builder()
                             .pointAmount(history.getPointAmount())

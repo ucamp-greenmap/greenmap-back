@@ -2,6 +2,7 @@ package com.ucamp.greenmap.point.service;
 
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.*;
+import com.ucamp.greenmap.point.enums.Type;
 
 public interface PointService {
 
@@ -15,7 +16,7 @@ public interface PointService {
 
     RankingResponse getRanking(Long memberId);
 
-    UserPointInfo getUserPointInfo(Long memberId);
+    UserPointInfo getUserPointInfo(Long memberId, Type type);
 
     CarbonInfoResponse getCarbonInfo(Long memberId);
 }
