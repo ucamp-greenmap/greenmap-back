@@ -8,5 +8,6 @@ public enum CategoryName {
     NEWS,
     CHALLENGE,
     CASH,
-    VOUCHER
+    VOUCHER,
+    BOOKMARK
 }
