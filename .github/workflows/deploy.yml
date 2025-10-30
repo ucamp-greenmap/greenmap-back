@@ -1,0 +1,69 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # main 브랜치에 푸시될 때 자동 배포
+  workflow_dispatch:  # 수동 배포도 가능하도록 설정
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}  # GCP 프로젝트 ID
+  REGION: asia-northeast3  # 서울 리전
+  SERVICE_NAME: greenmap-api  # Cloud Run 서비스 이름
+  REGISTRY: asia-northeast3-docker.pkg.dev  # Artifact Registry
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write  # Workload Identity Federation을 위한 권한
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Google Cloud 인증
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Cloud SDK 설정
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Docker 인증 설정
+        run: |
+          gcloud auth configure-docker ${{ env.REGISTRY }}
+
+      - name: Docker 이미지 빌드
+        run: |
+          cd greenmap
+          docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/greenmap/${{ env.SERVICE_NAME }}:${{ github.sha }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/greenmap/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+                     ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/greenmap/${{ env.SERVICE_NAME }}:latest
+
+      - name: Docker 이미지 푸시
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/greenmap/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/greenmap/${{ env.SERVICE_NAME }}:latest
+
+      - name: Cloud Run에 배포
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/greenmap/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars="SPRING_PROFILES_ACTIVE=prod" \
+            --set-secrets="DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,JWT_MS=JWT_MS:latest,KAKAO_CLIENT_ID=KAKAO_CLIENT_ID:latest,KAKAO_REDIRECT_URI=KAKAO_REDIRECT_URI:latest,KAKAO_REDIRECT_LOCAL=KAKAO_REDIRECT_LOCAL:latest,KAKAO_REDIRECT_PROD=KAKAO_REDIRECT_PROD:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_SECRET=CLIENT_SECRET:latest" \
+            --memory 1Gi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --port 8080
+
+      - name: 배포 결과 출력
+        run: |
+          echo "배포가 완료되었습니다!"
+          gcloud run services describe ${{ env.SERVICE_NAME }} --region ${{ env.REGION }} --format 'value(status.url)'
