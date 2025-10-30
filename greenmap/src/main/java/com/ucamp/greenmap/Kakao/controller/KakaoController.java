@@ -12,6 +12,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/login/oauth")
+@CrossOrigin(origins = "http://localhost:5173")
 public class KakaoController {
 
     private final KakaoService kakaoService;
