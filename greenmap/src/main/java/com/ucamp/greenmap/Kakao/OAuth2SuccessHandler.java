@@ -32,37 +32,30 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        // ✅ 카카오 JSON 구조에 맞게 안전하게 꺼내기
+        // ✅ 카카오 JSON 구조 가져오기
         Long kakaoId = oAuth2User.getAttribute("id");
-
         Map<String, Object> properties = oAuth2User.getAttribute("properties");
-        String nickname = properties != null ? (String) properties.get("nickname") : "카카오유저";
-
         Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
+
         String email = kakaoAccount != null ? (String) kakaoAccount.get("email") : null;
+        String nickname = properties != null ? (String) properties.get("nickname") : "카카오유저";
+        String profileImageUrl = properties != null ? (String) properties.get("profile_image") : null;
 
-        // ✅ 이메일 없으면 kakao:{id} 로 처리 (동의 안한 사용자 대비)
-        String principal = Optional.ofNullable(email).orElse("kakao:" + kakaoId);
-
-        Member user = userRepository.findByEmail(principal).orElse(null);
-
-        // ✅ 카카오 프로필 이미지 가져오기
-        String profileImageUrl = null;
-        if (properties != null) {
-            profileImageUrl = (String) properties.get("profile_image");
-        }
-
-        // ✅ 프로필 이미지 없으면 기본값
         if (profileImageUrl == null) {
             profileImageUrl = "https://em-content.zobj.net/thumbs/120/apple/325/leaf-fluttering-in-wind_1f343.png";
         }
 
+        // ✅ 이메일 없으면 kakao:{id} 사용
+        String principal = Optional.ofNullable(email).orElse("kakao:" + kakaoId);
+
+        // ✅ 기존 유저 조회
+        Member user = userRepository.findByEmail(principal).orElse(null);
+
+        // ✅ 신규 유저면 저장
         if (user == null) {
-            // ✅ Image 엔티티 저장
             Image img = new Image(profileImageUrl);
             imageRepository.save(img);
 
-            // ✅ Member 저장
             user = new Member();
             user.setEmail(principal);
             user.setKakaoId(kakaoId);
@@ -71,11 +64,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             user.setImage(img);
 
             userRepository.save(user);
-
         } else {
-            // ✅ 기존 유저 로그인 시, 이미지가 변경됐으면 업데이트
+            // ✅ 기존유저 프로필 이미지 갱신
             Image img = user.getImage();
-            if (!img.getImageUrl().equals(profileImageUrl)) {
+            if (img != null && !img.getImageUrl().equals(profileImageUrl)) {
                 img.setImageUrl(profileImageUrl);
                 imageRepository.save(img);
             }
@@ -84,10 +76,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // ✅ JWT 발급
         String accessToken = jwtTokenProvider.accessTokenGenerate(
                 user.getEmail(),
-                new Date(System.currentTimeMillis() + 1000L * 60 * 60)
+                new Date(System.currentTimeMillis() + 1000L * 60 * 60) // 1h
         );
 
-        // ✅ 프론트로 토큰 전달
+        // ✅ 프론트로 리다이렉트 + 토큰 전달
         response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
     }
 }

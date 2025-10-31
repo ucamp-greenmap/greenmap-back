@@ -34,10 +34,11 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse deactivateUser(String email) {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
-
         // 활성/비활성 토글
         member.setIsActive(!member.getIsActive());
         member.setUpdatedAt(LocalDateTime.now());
+
+        memberRepository.save(member);
 
         return MemberResponse.builder()
                 .memberId(member.getMemberId())
