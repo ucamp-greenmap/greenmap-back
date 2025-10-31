@@ -75,7 +75,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // ✅ JWT 발급
         String accessToken = jwtTokenProvider.accessTokenGenerate(
-                user.getEmail(),
+                user.getMemberId(),
                 new Date(System.currentTimeMillis() + 1000L * 60 * 60) // 1h
         );
 
