@@ -3,6 +3,7 @@ package com.ucamp.greenmap.point.controller;
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.*;
+import com.ucamp.greenmap.point.enums.Type;
 import com.ucamp.greenmap.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/point")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
 public class PointController {
 
     private final PointService pointService;
@@ -54,9 +56,9 @@ public class PointController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<UserPointInfo>> getUserPointInfo() {
+    public ResponseEntity<ApiResponse<UserPointInfo>> getUserPointInfo(@RequestParam Type type) {
         Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
-        UserPointInfo response = pointService.getUserPointInfo(memberId);
+        UserPointInfo response = pointService.getUserPointInfo(memberId, type);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 

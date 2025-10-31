@@ -122,6 +122,7 @@ public class NewsServiceImpl implements NewsService {
                     .nickname("nickname")
                     .password("password")
                     .build();
+
             Category category = new Category(1L, CategoryName.NEWS);
             NewsViewLog log = NewsViewLog.builder()
                     .member(member)

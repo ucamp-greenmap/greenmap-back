@@ -1,0 +1,26 @@
+# Gradle 빌드 관련
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE 설정
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# 문서
+README.md
+*.md
+
+# 로그
+*.log
+
+# 임시 파일
+*.tmp
+*.bak

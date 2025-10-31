@@ -27,18 +27,26 @@
 //        System.out.println("인가 코드 수신: " + code);
 //        return kakaoService.kakaoLogin(code, "local");
 //    }
-////    @GetMapping("/kakao")
-////    public void kakaoCallback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
-////        LoginResponse loginResponse = kakaoService.kakaoLogin(code, "local");
-////
-////        // 프론트 URL로 리다이렉트 (JWT 전달)
-////        String redirectUrl = "http://localhost:3000/login/success"
-////                + "?accessToken=" + loginResponse.getAccessToken()
-////                + "&refreshToken=" + loginResponse.getRefreshToken();
-////
-////        response.sendRedirect(redirectUrl);
-////    }
+//    @GetMapping("/kakao")
+//    public void kakaoCallback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
+//        LoginResponse loginResponse = kakaoService.kakaoLogin(code, "local");
 //
+//        // 프론트 URL로 리다이렉트 (JWT 전달)
+//        String redirectUrl = "http://localhost:3000/login/success"
+//                + "?accessToken=" + loginResponse.getAccessToken()
+//                + "&refreshToken=" + loginResponse.getRefreshToken();
 //
+//        response.sendRedirect(redirectUrl);
+//    }
+//
+//        // 프론트 URL로 리다이렉트 (JWT 전달)
+//        String redirectUrl = "http://localhost:3000/login/success"
+//                + "?accessToken=" + loginResponse.getAccessToken()
+//                + "&refreshToken=" + loginResponse.getRefreshToken();
+//
+//        response.sendRedirect(redirectUrl);
+//    }
+
+
 //}
-//
+
