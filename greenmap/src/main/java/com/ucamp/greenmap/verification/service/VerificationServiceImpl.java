@@ -7,6 +7,7 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.verification.domain.Validate;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
+import com.ucamp.greenmap.verification.dto.response.MonthlyVerificationResponse;
 import com.ucamp.greenmap.verification.dto.response.VerificationHistoryResponse;
 import com.ucamp.greenmap.verification.repository.ValidateRepository;
 import com.ucamp.greenmap.member.domain.Member;
@@ -216,6 +217,15 @@ public class VerificationServiceImpl implements VerificationService{
         }
         return VerificationHistoryResponse.builder()
                 .historyItems(verificationHistoryItems)
+                .build();
+    }
+
+    @Override
+    public MonthlyVerificationResponse getMonthlyVerification(Long memberId) {
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
+        return MonthlyVerificationResponse.builder()
+                .verifyTimes(point.getPointTimes())
+                .pointSum(point.getMonthPoint())
                 .build();
     }
 }

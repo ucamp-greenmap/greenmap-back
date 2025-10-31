@@ -4,6 +4,7 @@ import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.verification.dto.request.BikeRequest;
 import com.ucamp.greenmap.verification.dto.request.CarRequest;
 import com.ucamp.greenmap.verification.dto.request.ShopRequest;
+import com.ucamp.greenmap.verification.dto.response.MonthlyVerificationResponse;
 import com.ucamp.greenmap.verification.dto.response.VerificationHistoryResponse;
 import com.ucamp.greenmap.verification.dto.response.VerificationResponse;
 import com.ucamp.greenmap.verification.service.VerificationService;
@@ -39,6 +40,11 @@ public class VerificationController {
     @GetMapping("/history")
     public ResponseEntity<ApiResponse<VerificationHistoryResponse>> getVerificationHistory(@RequestHeader Long memberId) {
         return ResponseEntity.ok(ApiResponse.success("인증 내역 조회에 성공했습니다", verificationService.getVerificationHistory(memberId)));
+    }
+
+    @GetMapping("/month")
+    public ResponseEntity<ApiResponse<MonthlyVerificationResponse>> getMonthlyVerification(@RequestHeader Long memberId) {
+        return ResponseEntity.ok(ApiResponse.success("이번달 인증 내역 조회에 성공했습니다", verificationService.getMonthlyVerification(memberId)));
     }
 
 }
