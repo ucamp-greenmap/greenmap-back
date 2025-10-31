@@ -26,7 +26,7 @@ public class MemberController {
         return ResponseEntity.ok(ApiResponse.success("회원 정보 조회 성공", response));
     }
 
-    @PutMapping("deactivate")
+    @PutMapping("/deactivate")
     public ResponseEntity<MemberResponse> deactivateUser(@AuthenticationPrincipal String email) {
         MemberResponse response = memberService.deactivateUser(email);
         return ResponseEntity.ok(response);

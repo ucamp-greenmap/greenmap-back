@@ -1,12 +1,12 @@
 package com.ucamp.greenmap.member.dto.request;
 
 import com.ucamp.greenmap.image.domain.Image;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class MemberRequest {
     private Long memberId;
