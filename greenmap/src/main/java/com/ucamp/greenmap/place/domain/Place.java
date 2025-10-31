@@ -21,7 +21,7 @@ public class Place extends BaseEntity {
     @Column(name = "place_id")
     private Long placeId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "opening_id")
     private OpeningHours openingHours;
 
@@ -29,7 +29,7 @@ public class Place extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "image_id")
     private Image image;
 
@@ -37,10 +37,10 @@ public class Place extends BaseEntity {
     private String placeName;
 
     @Column(name = "location_x", nullable = false)
-    private String locationX;
+    private Double locationX;
 
     @Column(name = "location_y", nullable = false)
-    private String locationY;
+    private Double locationY;
 
     @Column(name = "address")
     private String address;
@@ -50,4 +50,11 @@ public class Place extends BaseEntity {
 
     @Column(name = "tel_num")
     private String telNum;
+
+    public void updateLocationX(double newX){
+        this.locationX = newX;
+    }
+    public void updateLocationY(double newY){
+        this.locationY = newY;
+    }
 }

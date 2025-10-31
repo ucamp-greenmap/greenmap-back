@@ -26,8 +26,8 @@ public class PlaceServiceImpl implements PlaceService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장소입니다."));
 
         // 1) 좌표 파싱 (locationX=경도, locationY=위도 라고 가정)
-        double placeLat = parseDoubleSafe(place.getLocationX());
-        double placeLon = parseDoubleSafe(place.getLocationY());
+        double placeLat = place.getLocationX();
+        double placeLon = place.getLocationY();
 
         // 2) 거리 계산 (km)
         double distanceKm = haversineKm(latitude, longitude, placeLat, placeLon);

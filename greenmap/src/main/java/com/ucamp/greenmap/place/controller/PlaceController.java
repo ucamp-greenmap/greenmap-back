@@ -2,10 +2,13 @@ package com.ucamp.greenmap.place.controller;
 
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.place.dto.response.PlaceDetailResponse;
+import com.ucamp.greenmap.place.service.KepcoEvIngestService;
 import com.ucamp.greenmap.place.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/place")
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class PlaceController {
 
     private final PlaceService placeService;
+    private final KepcoEvIngestService kepcoEvIngestService;
 
     @GetMapping("/{placeId}")
     public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetails(
@@ -23,5 +27,15 @@ public class PlaceController {
         // 유저가 있으면 넘기고 없으면 null로 넘기기
         PlaceDetailResponse response = placeService.getPlaceDetail(1L, placeId, longitude, latitude);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+
+    @GetMapping("/kepcoEV")
+    public ResponseEntity<Map<String, Object>> sync(@RequestParam String addr) {
+        int changed = kepcoEvIngestService.syncByAddress(addr);
+        return ResponseEntity.ok(Map.of(
+                "message", "OK",
+                "addr", addr,
+                "changed", changed
+        ));
     }
 }
