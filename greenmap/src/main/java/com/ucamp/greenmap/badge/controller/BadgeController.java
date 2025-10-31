@@ -18,7 +18,7 @@ public class BadgeController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<BadgeResponse>> getBadges(@RequestHeader Long memberId) {
-        return ResponseEntity.ok(ApiResponse.success(badgeService.searchBadges(memberId)));
+        return ResponseEntity.ok(ApiResponse.success("인증에 성공했습니다", badgeService.searchBadges(memberId)));
     }
 
 }
