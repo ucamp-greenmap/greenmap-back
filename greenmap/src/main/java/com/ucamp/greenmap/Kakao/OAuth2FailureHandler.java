@@ -18,7 +18,7 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
 
         System.out.println("OAuth2 Login Failed: " + exception.getMessage());
 
-        // 로그인 실패 시 프론트로 리다이렉트
-        response.sendRedirect("http://localhost:3000/login?error=oauth_failed");
+        response.sendRedirect("http://localhost:5173/login?error=oauth_failed");
     }
 }
+

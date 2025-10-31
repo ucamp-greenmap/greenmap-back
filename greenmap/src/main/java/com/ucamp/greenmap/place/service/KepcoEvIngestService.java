@@ -9,6 +9,7 @@ import com.ucamp.greenmap.place.domain.Place;
 import com.ucamp.greenmap.place.dto.response.KepcoEvResponse;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,17 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
-@RequiredArgsConstructor
 public class KepcoEvIngestService {
 
     private final WebClient kepcoClient;
     private final PlaceRepository placeRepository;
     private final CategoryRepository categoryRepository;
+
+    public KepcoEvIngestService(@Qualifier("kepcoClient") WebClient kepcoClient, PlaceRepository placeRepository, CategoryRepository categoryRepository) {
+        this.kepcoClient = kepcoClient;
+        this.placeRepository = placeRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Value("${kepco.path}")   private String path;
     @Value("${kepco.api-key}") private String apiKey;

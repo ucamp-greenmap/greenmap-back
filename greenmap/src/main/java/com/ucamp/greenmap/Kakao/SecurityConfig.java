@@ -26,8 +26,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login/oauth2/**",
                                 "/oauth2/**",
-                                "/error"
+                                "/login/success",
+                                "/error",
+                                "/favicon.ico"
                         ).permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth -> oauth
