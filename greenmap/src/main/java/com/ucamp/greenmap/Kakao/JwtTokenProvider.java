@@ -22,9 +22,9 @@ import java.util.Date;
             this.key = Keys.hmacShaKeyFor(keyBytes);
         }
 
-        public String accessTokenGenerate(String subject, Date expiredAt) {
+        public String accessTokenGenerate(Long subject, Date expiredAt) {
             return Jwts.builder()
-                    .setSubject(subject)    //uid
+                    .setSubject(String.valueOf(subject))    //uid
                     .setExpiration(expiredAt)
                     .signWith(key, SignatureAlgorithm.HS512)
                     .compact();
@@ -56,6 +56,10 @@ import java.util.Date;
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
+        }
+
+        public Long getMemberId(String token) {
+            return Long.valueOf(getSubject(token));
         }
 
     }
