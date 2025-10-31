@@ -83,6 +83,15 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(pointAmount)
+                .description("자전거 이용 인증")
+                .logId(history.getHistoryId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
@@ -135,6 +144,16 @@ public class VerificationServiceImpl implements VerificationService{
                 .build();
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
+
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(pointAmount)
+                .description("전기차/수소차 총전소 이용 인증")
+                .logId(history.getHistoryId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
@@ -196,6 +215,16 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(pointAmount)
+                .description("전기차/수소차 총전소 이용 인증")
+                .logId(history.getHistoryId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
+
         // Member의 Point, carbonSave 업데이트
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
         point.addPoint(pointAmount);
@@ -213,7 +242,9 @@ public class VerificationServiceImpl implements VerificationService{
         List<History> historyList = historyRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
         List<VerificationHistoryResponse.VerificationHistoryItem> verificationHistoryItems = new ArrayList<>();
         for (History history : historyList) {
+            log.info("here1");
             PointHistory pointHistory = pointHistoryRepository.findByLogId(history.getHistoryId()).orElseThrow();
+            log.info("here2s");
             verificationHistoryItems.add(VerificationHistoryResponse.VerificationHistoryItem.builder()
                     .category(history.getCategory().getCategoryName().toString())
                     .createdAt(history.getCreatedAt().toString())
