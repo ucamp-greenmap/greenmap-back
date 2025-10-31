@@ -59,14 +59,15 @@ jobs:
                     --vpc-egress all-traffic \
                     --add-cloudsql-instances elevated-nuance-476701-d9:asia-northeast3:greenmap-db \
                     --set-env-vars="SPRING_PROFILES_ACTIVE=prod" \
-                    --set-secrets="DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,JWT_MS=JWT_MS:latest,KAKAO_CLIENT_ID=KAKAO_CLIENT_ID:latest,KAKAO_REDIRECT_URI=KAKAO_REDIRECT_URI:latest,KAKAO_REDIRECT_LOCAL=KAKAO_REDIRECT_LOCAL:latest,KAKAO_REDIRECT_PROD=KAKAO_REDIRECT_PROD:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_SECRET=CLIENT_SECRET:latest" \
+                    --set-secrets="DB_URL=DB_URL:latest,DB_USERNAME=DB_USERNAME:latest,DB_PASSWORD=DB_PASSWORD:latest,JWT_SECRET_KEY=JWT_SECRET_KEY:latest,JWT_MS=JWT_MS:latest,KAKAO_CLIENT_ID=KAKAO_CLIENT_ID:latest,KAKAO_REDIRECT_URI=KAKAO_REDIRECT_URI:latest,KAKAO_REDIRECT_LOCAL=KAKAO_REDIRECT_LOCAL:latest,KAKAO_REDIRECT_PROD=KAKAO_REDIRECT_PROD:latest,CLIENT_ID=CLIENT_ID:latest,CLIENT_SECRET=CLIENT_SECRET:latest,KEPCO_API_KEY=KEPCO_API_KEY:latest" \
                     --memory 1Gi \
                     --cpu 1 \
                     --min-instances 0 \
                     --max-instances 10 \
                     --port 8080 \
                     --timeout 300 \
-                    --cpu-boost
+                    --cpu-boost \
+                    --no-cpu-throttling
 
             - name: 배포 결과 출력
               run: |
