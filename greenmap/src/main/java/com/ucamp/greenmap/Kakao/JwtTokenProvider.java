@@ -36,4 +36,26 @@ import java.util.Date;
                     .signWith(key, SignatureAlgorithm.HS512)
                     .compact();
         }
+
+        public boolean validateToken(String token) {
+            try {
+                Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(token);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+
+        public String getSubject(String token) {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        }
+
     }

@@ -1,28 +1,44 @@
 package com.ucamp.greenmap.Kakao;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // REST API 서버니까 CSRF 비활성화
+                .csrf(csrf -> csrf.disable())
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/users/login/oauth/start",  // 로그인 시작 경로
-                                "/api/users/login/oauth/kakao",   // 카카오 콜백 경로
-                                "/**"
-                        ).permitAll()  // /error 경로도 허용
-                        .anyRequest().authenticated()  // 나머지 요청은 인증 필요
+                                "/login/oauth2/**",
+                                "/oauth2/**",
+                                "/error"
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.disable())  // 기본 로그인 비활성화
-                .httpBasic(basic -> basic.disable());  // 기본 HTTP 인증 비활성화
+                .oauth2Login(oauth -> oauth
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler)
+                );
+
+        http.addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 }
+
