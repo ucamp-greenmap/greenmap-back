@@ -14,5 +14,6 @@ public class MemberRequest {
     private Image image;
     private String email;
     private String nickname;
+    private Long ImageId;
 
 }
