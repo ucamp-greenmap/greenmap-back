@@ -17,6 +17,5 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
     List<Point> findTop10ByOrderByPointDesc();
 
-
     Long countByPointGreaterThan(Long point);
 }
