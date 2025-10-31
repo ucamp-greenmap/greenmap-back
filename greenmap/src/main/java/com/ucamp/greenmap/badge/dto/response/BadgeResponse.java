@@ -14,6 +14,8 @@ public class BadgeResponse {
     private Long success_rate;
     private List<BadgeItems>  badge_list;
 
+    @Data
+    @Builder
     public static class BadgeItems {
         private String name;
         private String description;
