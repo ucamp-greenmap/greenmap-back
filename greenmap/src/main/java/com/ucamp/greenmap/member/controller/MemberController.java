@@ -24,23 +24,23 @@ public class MemberController {
     public ResponseEntity<ApiResponse<MemberResponse>> getMyInfo(@AuthenticationPrincipal Long memberId) {
 
         log.info("memberId :" + memberId);
-//        MemberResponse response = memberService.getMyInfo(memberId);
+        MemberResponse response = memberService.getMyInfo(memberId);
 
-        return null;//ResponseEntity.ok(ApiResponse.success("회원 정보 조회 성공", response));
+        return ResponseEntity.ok(ApiResponse.success("회원 정보 조회 성공", response));
     }
 
     @PutMapping("/deactivate")
-    public ResponseEntity<MemberResponse> deactivateUser(@AuthenticationPrincipal String email) {
-        MemberResponse response = memberService.deactivateUser(email);
+    public ResponseEntity<MemberResponse> deactivateUser(@AuthenticationPrincipal Long memberId) {
+        MemberResponse response = memberService.deactivateUser(memberId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping
     public ResponseEntity<MemberResponse> updateUser(
             @RequestBody MemberRequest request,
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal Long memberId
     ) {
-        MemberResponse response = memberService.updateUser(request, email);
+        MemberResponse response = memberService.updateUser(request, memberId);
         return ResponseEntity.ok(response);
     }
 

@@ -22,8 +22,8 @@ public class MemberServiceImpl implements MemberService {
     private  final ImageRepository imageRepository;
 
     //내 정보 조회 (JWT email 기반)
-    public MemberResponse getMyInfo(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public MemberResponse getMyInfo(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
 
         return MemberResponse.memberResponse(member);
@@ -31,8 +31,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
    //회원 상태 수정
-    public MemberResponse deactivateUser(String email) {
-        Member member = memberRepository.findByEmail(email)
+    public MemberResponse deactivateUser(Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
         // 활성/비활성 토글
         member.setIsActive(!member.getIsActive());
@@ -54,8 +54,8 @@ public class MemberServiceImpl implements MemberService {
                 .build();
     }
 
-    public MemberResponse updateUser(MemberRequest request, String email) {
-        Member member = memberRepository.findByEmail(email)
+    public MemberResponse updateUser(MemberRequest request, Long memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
 
         // 정보 수정
