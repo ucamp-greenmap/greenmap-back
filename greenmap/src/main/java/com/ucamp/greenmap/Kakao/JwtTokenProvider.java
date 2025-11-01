@@ -61,5 +61,8 @@ import java.util.Date;
         public Long getMemberId(String token) {
             return Long.valueOf(getSubject(token));
         }
+        public String getEmail(String token) {
+            return String.valueOf(getSubject(token));
+        }
 
     }
