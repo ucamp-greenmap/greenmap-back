@@ -1,6 +1,7 @@
 package com.ucamp.greenmap.challenge.controller;
 
 import com.ucamp.greenmap.challenge.dto.request.MemberChallengeDto;
+import com.ucamp.greenmap.challenge.dto.response.AttendChallengeResponse;
 import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
 import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
 import com.ucamp.greenmap.challenge.service.MemberChallengeServcieImpl;
@@ -38,6 +39,14 @@ public class MemberChallengeController {
     ) {
         ChallengeAvailResponse response = memberChallengeServcie.availChallenge(memberId);
         return ResponseEntity.ok(ApiResponse.success("참여 가능한 챌린지 조회 성공", response));
+    }
+
+    @GetMapping("/attend")
+    public ResponseEntity<ApiResponse<AttendChallengeResponse>> attendChallenge(
+            @AuthenticationPrincipal Long memberId
+    ){
+        AttendChallengeResponse response = memberChallengeServcie.attendChallenge(memberId);
+        return ResponseEntity.ok(ApiResponse.success("참여중인 챌린지 조회 성공",response));
     }
 
 

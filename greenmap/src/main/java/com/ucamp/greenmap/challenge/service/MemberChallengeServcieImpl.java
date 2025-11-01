@@ -2,6 +2,8 @@ package com.ucamp.greenmap.challenge.service;
 
 import com.ucamp.greenmap.challenge.domain.Challenge;
 import com.ucamp.greenmap.challenge.domain.MemberChallenge;
+import com.ucamp.greenmap.challenge.dto.response.AttendChallengeDetail;
+import com.ucamp.greenmap.challenge.dto.response.AttendChallengeResponse;
 import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
 import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
 import com.ucamp.greenmap.challenge.repository.ChallengeRepository;
@@ -11,7 +13,9 @@ import com.ucamp.greenmap.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +69,48 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .availableChallenges(availableChallenges)
                 .build();
     }
+
+    @Override
+    public AttendChallengeResponse attendChallenge(Long memberId) {
+        // 1. 회원 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
+
+        // 2. 참여중인 챌린지 조회
+        List<MemberChallenge> attendChallenges =
+                memberChallengeRepository.findAttendChallengesByMemberId(memberId);
+
+        // 3. DTO 리스트 생성
+        List<AttendChallengeDetail> challengeDtoList = new ArrayList<>();
+
+        for (MemberChallenge memberChallenge : attendChallenges) {
+            Challenge challenge = memberChallenge.getChallenge();
+
+            // DTO에 넣기
+            AttendChallengeDetail attendChallengeDetail = AttendChallengeDetail.builder()
+                    .challengeId(challenge.getChallengeId())
+                    .challengeName(challenge.getChallengeName())
+                    .description(challenge.getDescription())
+                    .pointAmount(challenge.getPointAmount())
+                    .progress(memberChallenge.getProgress())
+                    .createdAt(memberChallenge.getCreatedAt())
+                    .deadline(challenge.getDeadline())
+                    .memberCount(challenge.getMemberCount())
+                    .success(challenge.getSuccess())
+                    .isActive(challenge.getIsActive())
+                    .build();
+
+            challengeDtoList.add(attendChallengeDetail);
+        }
+
+        // 4. 응답 DTO 반환
+        return AttendChallengeResponse.builder()
+                .memberId(memberId)
+                .challenges(challengeDtoList)
+                .build();
+    }
+
+
+
 
 }
