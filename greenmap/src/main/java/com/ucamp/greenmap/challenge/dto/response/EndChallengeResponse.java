@@ -9,8 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class AttendChallengeResponse {
+public class EndChallengeResponse {
     private Long memberId;
     private List<ChallengeDetail> challenges;
 }
-

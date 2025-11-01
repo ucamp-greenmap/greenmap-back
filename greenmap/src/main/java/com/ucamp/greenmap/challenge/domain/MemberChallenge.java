@@ -30,4 +30,6 @@ public class MemberChallenge extends BaseEntity {
 
     @Column(name = "progress", nullable = false)
     private Long progress;
+
+
 }
