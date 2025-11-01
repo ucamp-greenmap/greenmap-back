@@ -2,6 +2,7 @@ package com.ucamp.greenmap.challenge.service;
 
 import com.ucamp.greenmap.challenge.domain.Challenge;
 import com.ucamp.greenmap.challenge.domain.MemberChallenge;
+import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
 import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
 import com.ucamp.greenmap.challenge.repository.ChallengeRepository;
 import com.ucamp.greenmap.challenge.repository.MemberChallengeRepository;
@@ -10,17 +11,18 @@ import com.ucamp.greenmap.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MemberChallengeServcieImpl implements MemberChallengeService {
 
     private final MemberChallengeRepository memberChallengeRepository;
     private final ChallengeRepository challengeRepository;
-    private final MemberRepository memberRepository; // 필요
+    private final MemberRepository memberRepository;
 
     @Override
     public MemberChallengeregis registMemberChallenge(Long memberId, Long challengeId){
-
         // 1. 회원 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
@@ -48,4 +50,20 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .progress(0L)
                 .build();
     }
+    @Override
+    public ChallengeAvailResponse availChallenge(Long memberId){
+
+        // 1. 회원 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
+
+        // 2. 참여하지 않은 챌린지 조회
+        List<Challenge> availableChallenges = challengeRepository.findAvailableChallengesByMemberId(memberId);
+
+        return ChallengeAvailResponse.builder()
+                .memberId(memberId)
+                .availableChallenges(availableChallenges)
+                .build();
+    }
+
 }
