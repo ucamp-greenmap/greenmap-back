@@ -1,6 +1,7 @@
 package com.ucamp.greenmap.challenge.controller;
 
 import com.ucamp.greenmap.challenge.dto.request.MemberChallengeDto;
+import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
 import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
 import com.ucamp.greenmap.challenge.service.MemberChallengeServcieImpl;
 import com.ucamp.greenmap.common.dto.ApiResponse;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/chal")
@@ -28,5 +31,15 @@ public class MemberChallengeController {
 
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
+
+    @GetMapping("/available")
+    public ResponseEntity<ApiResponse<ChallengeAvailResponse>> availChallenge(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        ChallengeAvailResponse response = memberChallengeServcie.availChallenge(memberId);
+        return ResponseEntity.ok(ApiResponse.success("참여 가능한 챌린지 조회 성공", response));
+    }
+
+
 
 }
