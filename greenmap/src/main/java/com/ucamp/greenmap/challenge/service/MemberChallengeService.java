@@ -2,6 +2,7 @@ package com.ucamp.greenmap.challenge.service;
 
 import com.ucamp.greenmap.challenge.dto.response.AttendChallengeResponse;
 import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
+import com.ucamp.greenmap.challenge.dto.response.EndChallengeResponse;
 import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
 
 public interface MemberChallengeService {
@@ -11,4 +12,6 @@ public interface MemberChallengeService {
     ChallengeAvailResponse availChallenge(Long memberId);
 
     AttendChallengeResponse attendChallenge(Long memberId);
+
+    EndChallengeResponse endChallenge(Long memberId);
 }
