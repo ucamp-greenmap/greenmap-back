@@ -75,7 +75,7 @@ public class VerificationServiceImpl implements VerificationService{
         long carbonSave = (long) (Math.ceil((double) bikeRequest.getDistance() / 5));
         Long pointAmount = (long) ((double) bikeRequest.getDistance() / 0.1);
 
-        // History 생성 및 저장
+        // 인증 내역 생성 및 저장
         History history = History.builder()
                 .member(member)
                 .place(place)
@@ -86,6 +86,7 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        // PointHistory 생성 및 저장
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
                 .category(category)
@@ -101,6 +102,7 @@ public class VerificationServiceImpl implements VerificationService{
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
+        // 뱃지 최신화
         MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
@@ -157,6 +159,7 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        // PointHistory 생성 및 저장
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
                 .category(category)
@@ -172,6 +175,7 @@ public class VerificationServiceImpl implements VerificationService{
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
+        // 뱃지 최신화
         MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
@@ -236,6 +240,7 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        // PointHistory 생성 및 저장
         PointHistory pointHistory = PointHistory.builder()
                 .member(member)
                 .category(category)
@@ -251,6 +256,7 @@ public class VerificationServiceImpl implements VerificationService{
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
+        // 뱃지 최신화
         MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
@@ -269,18 +275,23 @@ public class VerificationServiceImpl implements VerificationService{
 
     @Override
     public VerificationHistoryResponse getVerificationHistory(Long memberId) {
+        // 인증 내역 조회 (따릉이, 전기차/수소차, 재활용센터, 제로웨이스트)
         List<History> historyList = historyRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
+
+        // 인증 내역을 Response 형식으로 저장할 List 생성
         List<VerificationHistoryResponse.VerificationHistoryItem> verificationHistoryItems = new ArrayList<>();
+
+        // 각 인증 내역에 대해 PointHistory 조회 및 Response 형식으로 변환 (수정 필요)
         for (History history : historyList) {
-            log.info("here1");
             PointHistory pointHistory = pointHistoryRepository.findByLogId(history.getHistoryId()).orElseThrow();
-            log.info("here2s");
             verificationHistoryItems.add(VerificationHistoryResponse.VerificationHistoryItem.builder()
                     .category(history.getCategory().getCategoryName().toString())
                     .createdAt(history.getCreatedAt().toString())
                     .point(pointHistory.getPointAmount())
                     .build());
         }
+
+        // Response 반환
         return VerificationHistoryResponse.builder()
                 .historyItems(verificationHistoryItems)
                 .build();
@@ -288,7 +299,10 @@ public class VerificationServiceImpl implements VerificationService{
 
     @Override
     public MonthlyVerificationResponse getMonthlyVerification(Long memberId) {
+        // 이번달 Point 정보 조회
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
+
+        // Response 반환
         return MonthlyVerificationResponse.builder()
                 .verifyTimes(point.getPointTimes())
                 .pointSum(point.getMonthPoint())

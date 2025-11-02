@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public interface NewsService {
-    public ResponseEntity<ApiResponse<NewsResponse>> searchNews();
+    public NewsResponse searchNews();
 
-    ResponseEntity<ApiResponse<String>> viewNews(NewsRequest newsRequest);
+    String viewNews(NewsRequest newsRequest);
 }
