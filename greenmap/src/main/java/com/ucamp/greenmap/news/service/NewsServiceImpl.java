@@ -68,11 +68,11 @@ public class NewsServiceImpl implements NewsService {
 
     /**
      * 네이버 뉴스 검색
-     *
-     * @param query   검색어 (예: "친환경")
-     * @param display 검색 결과 개수 (기본값: 10, 최대: 100)
-     * @param start   검색 시작 위치 (기본값: 1, 최대: 1000)
-     * @param sort    정렬 옵션 (sim: 정확도순, date: 날짜순)
+     * <p>
+     * // @param query   검색어 (예: "친환경")
+     * // @param display 검색 결과 개수 (기본값: 10, 최대: 100)
+     * // @param start   검색 시작 위치 (기본값: 1, 최대: 1000)
+     * // @param sort    정렬 옵션 (sim: 정확도순, date: 날짜순)
      * @return 뉴스 검색 결과
      */
     @Override
