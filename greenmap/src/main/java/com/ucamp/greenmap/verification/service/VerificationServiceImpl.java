@@ -4,6 +4,8 @@ import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
 import com.ucamp.greenmap.point.domain.Point;
+import com.ucamp.greenmap.point.domain.PointHistory;
+import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.verification.domain.Validate;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
@@ -26,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -37,6 +40,7 @@ public class VerificationServiceImpl implements VerificationService{
     private final CategoryRepository categoryRepository;
     private final PlaceRepository placeRepository;
     private final PointRepository pointRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
     @Override
     public VerificationResponse verifyBike(Long memberId, BikeRequest bikeRequest) {
@@ -79,6 +83,15 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(pointAmount)
+                .description("자전거 이용 인증")
+                .logId(history.getHistoryId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
@@ -131,6 +144,16 @@ public class VerificationServiceImpl implements VerificationService{
                 .build();
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
+
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(pointAmount)
+                .description("전기차/수소차 총전소 이용 인증")
+                .logId(history.getHistoryId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
@@ -192,6 +215,16 @@ public class VerificationServiceImpl implements VerificationService{
         history.setCreatedAt(LocalDateTime.now());
         historyRepository.save(history);
 
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(pointAmount)
+                .description("전기차/수소차 총전소 이용 인증")
+                .logId(history.getHistoryId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
+
         // Member의 Point, carbonSave 업데이트
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
         point.addPoint(pointAmount);
@@ -209,10 +242,13 @@ public class VerificationServiceImpl implements VerificationService{
         List<History> historyList = historyRepository.findByMember_MemberIdOrderByCreatedAtDesc(memberId);
         List<VerificationHistoryResponse.VerificationHistoryItem> verificationHistoryItems = new ArrayList<>();
         for (History history : historyList) {
+            log.info("here1");
+            PointHistory pointHistory = pointHistoryRepository.findByLogId(history.getHistoryId()).orElseThrow();
+            log.info("here2s");
             verificationHistoryItems.add(VerificationHistoryResponse.VerificationHistoryItem.builder()
                     .category(history.getCategory().getCategoryName().toString())
                     .createdAt(history.getCreatedAt().toString())
-                    .point(history.getCarbonSave())
+                    .point(pointHistory.getPointAmount())
                     .build());
         }
         return VerificationHistoryResponse.builder()
