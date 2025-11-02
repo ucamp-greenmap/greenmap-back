@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,4 +29,9 @@ public class MemberBadge extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "badge_id")
     private Badge badge;
+
+    public void updateBadge(Badge badge) {
+        this.badge = badge;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

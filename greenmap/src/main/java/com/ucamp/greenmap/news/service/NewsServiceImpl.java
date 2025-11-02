@@ -1,9 +1,13 @@
 package com.ucamp.greenmap.news.service;
 
+import com.ucamp.greenmap.badge.domain.Badge;
+import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.BadgeRepository;
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.common.dto.ApiResponse;
-import com.ucamp.greenmap.image.domain.Image;
+import com.ucamp.greenmap.common.repository.CategoryRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.news.domain.NewsViewLog;
 import com.ucamp.greenmap.news.dto.request.NewsRequest;
@@ -13,6 +17,7 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
 import com.ucamp.greenmap.point.repository.PointRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,11 +33,15 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 public class NewsServiceImpl implements NewsService {
     private final WebClient webClient;
     private final NewsRepository newsRepository;
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
+    private final BadgeRepository badgeRepository;
+    private final CategoryRepository categoryRepository;
 
     @Value("${naver.api.client-id}")
     private String clientId;
@@ -44,20 +53,26 @@ public class NewsServiceImpl implements NewsService {
     public NewsServiceImpl(@Qualifier("naverWebClient") WebClient webClient,
                            NewsRepository newsRepository,
                            PointRepository pointRepository,
-                           PointHistoryRepository pointHistoryRepository) {
+                           PointHistoryRepository pointHistoryRepository,
+                           MemberBadgeRepository memberBadgeRepository,
+                           BadgeRepository badgeRepository,
+                           CategoryRepository categoryRepository) {
         this.webClient = webClient;
         this.newsRepository = newsRepository;
         this.pointRepository = pointRepository;
         this.pointHistoryRepository = pointHistoryRepository;
+        this.memberBadgeRepository = memberBadgeRepository;
+        this.badgeRepository = badgeRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     /**
      * 네이버 뉴스 검색
-     *
-     * @param query   검색어 (예: "친환경")
-     * @param display 검색 결과 개수 (기본값: 10, 최대: 100)
-     * @param start   검색 시작 위치 (기본값: 1, 최대: 1000)
-     * @param sort    정렬 옵션 (sim: 정확도순, date: 날짜순)
+     * <p>
+     * // @param query   검색어 (예: "친환경")
+     * // @param display 검색 결과 개수 (기본값: 10, 최대: 100)
+     * // @param start   검색 시작 위치 (기본값: 1, 최대: 1000)
+     * // @param sort    정렬 옵션 (sim: 정확도순, date: 날짜순)
      * @return 뉴스 검색 결과
      */
     @Override
@@ -116,14 +131,11 @@ public class NewsServiceImpl implements NewsService {
 
         try {
             Member member = Member.builder()
-                    .memberId(1L)
-                    .image(new Image(1L, "url"))
-                    .email("email")
-                    .nickname("nickname")
-                    .password("password")
+                    .memberId(request.getMemberId())
                     .build();
 
-            Category category = new Category(1L, CategoryName.NEWS);
+            Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow();
+
             NewsViewLog log = NewsViewLog.builder()
                     .member(member)
                     .newsTitle(request.getTitle())
@@ -148,6 +160,15 @@ public class NewsServiceImpl implements NewsService {
 
             Point point = pointRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
             point.addPoint(5L);
+
+            MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
+            Badge nextBadge = badgeRepository.findById(
+                    memberBadge.getBadge().getBadgeId() != 5 ?
+                            memberBadge.getBadge().getBadgeId() + 1 : 5
+            ).orElseThrow();
+            if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
+                memberBadge.updateBadge(nextBadge);
+            }
 
             return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));
         } catch (Exception e) {
