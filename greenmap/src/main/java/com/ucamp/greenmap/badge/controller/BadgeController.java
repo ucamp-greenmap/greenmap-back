@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BadgeController {
     private final BadgeService badgeService;
 
+    // 뱃지 조회
     @GetMapping
     public ResponseEntity<ApiResponse<BadgeResponse>> getBadges(@RequestHeader Long memberId) {
         return ResponseEntity.ok(ApiResponse.success("인증에 성공했습니다", badgeService.searchBadges(memberId)));

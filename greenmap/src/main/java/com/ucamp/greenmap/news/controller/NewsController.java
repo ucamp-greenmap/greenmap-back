@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 public class NewsController {
     private final NewsService newsService;
 
+    // 뉴스 목록 조회
     @GetMapping
     public ResponseEntity<ApiResponse<NewsResponse>> searchNews() {
         return newsService.searchNews();
     }
 
+    // 뉴스 단건 조회
     @PostMapping
     public ResponseEntity<ApiResponse<String>> viewNews(@RequestBody NewsRequest newsRequest) {
         return newsService.viewNews(newsRequest);

@@ -73,110 +73,105 @@ public class NewsServiceImpl implements NewsService {
      * // @param display 검색 결과 개수 (기본값: 10, 최대: 100)
      * // @param start   검색 시작 위치 (기본값: 1, 최대: 1000)
      * // @param sort    정렬 옵션 (sim: 정확도순, date: 날짜순)
+     *
      * @return 뉴스 검색 결과
      */
     @Override
     public ResponseEntity<ApiResponse<NewsResponse>> searchNews() {
 
-        try {
-            NewsResponse newsResponse = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/v1/search/news.json")
-                            .queryParam("query", "환경")
-                            .queryParam("display", 6)
-                            .build())
-                    .header("X-Naver-Client-Id", clientId)
-                    .header("X-Naver-Client-Secret", clientSecret)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, response -> {
-                        log.info("Client error : {}", response.statusCode());
-                        return Mono.error(new RuntimeException("Client Error가 발생했습니다."));
-                    })
-                    .onStatus(HttpStatusCode::is5xxServerError, response -> {
-                        log.info("Server error : {}", response.statusCode());
-                        return Mono.error(new RuntimeException("Server Error가 발생했습니다."));
-                    })
-                    .bodyToMono(NewsResponse.class)
-                    .block();
+        // WebClient를 사용하여 네이버 뉴스 검색 API 호출
+        NewsResponse newsResponse = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v1/search/news.json")
+                        .queryParam("query", "환경")
+                        .queryParam("display", 6)
+                        .build())
+                .header("X-Naver-Client-Id", clientId)
+                .header("X-Naver-Client-Secret", clientSecret)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, response -> {
+                    log.info("Client error : {}", response.statusCode());
+                    return Mono.error(new RuntimeException("Client Error가 발생했습니다."));
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, response -> {
+                    log.info("Server error : {}", response.statusCode());
+                    return Mono.error(new RuntimeException("Server Error가 발생했습니다."));
+                })
+                .bodyToMono(NewsResponse.class)
+                .block();
 
 
-            List<NewsResponse.NewsItem> newsList = null;
-            try {
-                newsList = newsResponse.getItems();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-
-            while (newsList.size() > 4) {
-                newsList.removeLast();
-            }
-
-            for (NewsResponse.NewsItem item : newsList) {
-                if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), 1L)) {
-                    item.setRead(true);
-                }
-            }
-
-            return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스 목록을 조회했습니다.", newsResponse));
-
-        } catch (RuntimeException e) {
-            log.info("error catched : " + e.getMessage());
-            return ResponseEntity.ok(ApiResponse.error("실패"));
+        // API 응답 검증
+        if (newsResponse == null) {
+            return ResponseEntity.ok(ApiResponse.error("뉴스 조회에 실패했습니다. API 응답이 없습니다."));
         }
+
+        // 받아온 뉴스들 중 4개만 남기기
+        List<NewsResponse.NewsItem> newsList = newsResponse.getItems();
+        while (newsList.size() > 4) {
+            newsList.removeLast();
+        }
+
+        // 이미 읽은 뉴스인지 확인 및 isRead 설정
+        for (NewsResponse.NewsItem item : newsList) {
+            if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), 1L)) {
+                item.setRead(true);
+            }
+        }
+
+        // 성공 응답 반환
+        return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스 목록을 조회했습니다.", newsResponse));
 
     }
 
     @Override
     public ResponseEntity<ApiResponse<String>> viewNews(NewsRequest request) {
 
-        try {
-            Member member = Member.builder()
-                    .memberId(request.getMemberId())
-                    .build();
+        // 필요한 엔티티 생성 및 조회
+        Member member = Member.builder()
+                .memberId(request.getMemberId())
+                .build();
+        Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow();
 
-            Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow();
+        // 뉴스 뷰 로그 저장
+        NewsViewLog log = NewsViewLog.builder()
+                .member(member)
+                .newsTitle(request.getTitle())
+                .build();
+        log.setCreatedAt(LocalDateTime.now());
+        newsRepository.save(log);
 
-            NewsViewLog log = NewsViewLog.builder()
-                    .member(member)
-                    .newsTitle(request.getTitle())
-                    .build();
-            log.setCreatedAt(LocalDateTime.now());
+        // 포인트 히스토리 저장
+        NewsViewLog newsViewLog = newsRepository.findByNewsTitleAndMember_MemberId(request.getTitle(), member.getMemberId());
+        PointHistory pointHistory = PointHistory.builder()
+                .member(member)
+                .category(category)
+                .pointAmount(5L)
+                .description("description")
+                .logId(newsViewLog.getLogId())
+                .build();
+        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistoryRepository.save(pointHistory);
 
-            newsRepository.save(log);
+        // 포인트 적립
+        Point point = pointRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
+        point.addPoint(5L);
 
-            NewsViewLog newsViewLog = newsRepository.findByNewsTitleAndMember_MemberId(request.getTitle(), member.getMemberId());
-
-            PointHistory pointHistory = PointHistory.builder()
-                    .member(member)
-                    .category(category)
-                    .pointAmount(5L)
-                    .description("description")
-                    .logId(newsViewLog.getLogId())
-                    .build();
-
-            pointHistory.setCreatedAt(LocalDateTime.now());
-
-            pointHistoryRepository.save(pointHistory);
-
-            Point point = pointRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
-            point.addPoint(5L);
-
-            MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
-            Badge nextBadge = badgeRepository.findById(
-                    memberBadge.getBadge().getBadgeId() != 5 ?
-                            memberBadge.getBadge().getBadgeId() + 1 : 5
-            ).orElseThrow();
-            if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
-                memberBadge.updateBadge(nextBadge);
-            }
-
-            return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));
-        } catch (Exception e) {
-            log.error("error catched : " + e.getMessage());
-            return ResponseEntity.ok(ApiResponse.error("실패"));
+        // 뱃지 최신화
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
+        Badge nextBadge = badgeRepository.findById(
+                memberBadge.getBadge().getBadgeId() != 5 ?
+                        memberBadge.getBadge().getBadgeId() + 1 : 5
+        ).orElseThrow();
+        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
+            memberBadge.updateBadge(nextBadge);
         }
+
+        // 성공 응답 반환
+        return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));
     }
 
+    // HTML 태그 제거 메서드 (현재 미사용)
     private String removeHtmlTags(String text) {
         return text.replaceAll("<[^>]*>", "")
                 .replaceAll("&quot;", "\"")
