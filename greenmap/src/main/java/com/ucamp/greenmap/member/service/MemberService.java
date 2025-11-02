@@ -6,9 +6,9 @@ import com.ucamp.greenmap.member.dto.response.MemberResponse;
 public interface MemberService {
 
 
-    MemberResponse getMyInfo(String email);
+    MemberResponse getMyInfo(Long memberId);
 
-    MemberResponse deactivateUser(String email);
+    MemberResponse deactivateUser(Long memberId);
 
-    MemberResponse updateUser(MemberRequest request, String email);
+    MemberResponse updateUser(MemberRequest request, Long memberId);
 }

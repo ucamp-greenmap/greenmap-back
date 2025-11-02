@@ -27,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        //  카카오 인증 콜백 URL은 JWT 필터 건너뛰기
         String uri = request.getRequestURI();
         if (uri.startsWith("/login/oauth2") || uri.startsWith("/oauth2")) {
             filterChain.doFilter(request, response);
@@ -34,13 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
+
         String token = resolveToken(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String userId = jwtTokenProvider.getSubject(token);
+            Long memberId = jwtTokenProvider.getMemberId(token);
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userId, null, null);
+                    new UsernamePasswordAuthenticationToken(memberId, null, null);
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

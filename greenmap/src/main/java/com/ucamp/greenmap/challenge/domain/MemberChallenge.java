@@ -29,5 +29,7 @@ public class MemberChallenge extends BaseEntity {
     private Challenge challenge;
 
     @Column(name = "progress", nullable = false)
-    private Integer progress;
+    private Long progress;
+
+
 }

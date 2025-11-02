@@ -5,6 +5,7 @@ import com.ucamp.greenmap.member.dto.request.MemberRequest;
 import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -13,31 +14,33 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/member")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
 
     //내 정보 조회 (JWT 기반)
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<MemberResponse>> getMyInfo(@AuthenticationPrincipal String email) {
+    public ResponseEntity<ApiResponse<MemberResponse>> getMyInfo(@AuthenticationPrincipal Long memberId) {
 
-        MemberResponse response = memberService.getMyInfo(email);
+        log.info("memberId :" + memberId);
+        MemberResponse response = memberService.getMyInfo(memberId);
 
         return ResponseEntity.ok(ApiResponse.success("회원 정보 조회 성공", response));
     }
 
     @PutMapping("/deactivate")
-    public ResponseEntity<MemberResponse> deactivateUser(@AuthenticationPrincipal String email) {
-        MemberResponse response = memberService.deactivateUser(email);
+    public ResponseEntity<MemberResponse> deactivateUser(@AuthenticationPrincipal Long memberId) {
+        MemberResponse response = memberService.deactivateUser(memberId);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping
     public ResponseEntity<MemberResponse> updateUser(
             @RequestBody MemberRequest request,
-            @AuthenticationPrincipal String email
+            @AuthenticationPrincipal Long memberId
     ) {
-        MemberResponse response = memberService.updateUser(request, email);
+        MemberResponse response = memberService.updateUser(request, memberId);
         return ResponseEntity.ok(response);
     }
 

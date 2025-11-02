@@ -1,0 +1,63 @@
+package com.ucamp.greenmap.challenge.controller;
+
+import com.ucamp.greenmap.challenge.dto.request.MemberChallengeDto;
+import com.ucamp.greenmap.challenge.dto.response.AttendChallengeResponse;
+import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
+import com.ucamp.greenmap.challenge.dto.response.EndChallengeResponse;
+import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
+import com.ucamp.greenmap.challenge.service.MemberChallengeServcieImpl;
+import com.ucamp.greenmap.common.dto.ApiResponse;
+import io.swagger.models.Response;
+import org.springframework.web.bind.annotation.RequestBody;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/chal")
+@RequiredArgsConstructor
+public class MemberChallengeController {
+
+    private final MemberChallengeServcieImpl memberChallengeServcie;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<MemberChallengeregis>> regisMemChal(
+            @RequestBody MemberChallengeDto request,
+            @AuthenticationPrincipal Long memberId)
+    {
+        MemberChallengeregis response =
+                memberChallengeServcie.registMemberChallenge(memberId, request.getChallengeId());
+
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+    //참여 가능 챌린지
+    @GetMapping("/available")
+    public ResponseEntity<ApiResponse<ChallengeAvailResponse>> availChallenge(
+            @AuthenticationPrincipal Long memberId)
+    {
+        ChallengeAvailResponse response = memberChallengeServcie.availChallenge(memberId);
+        return ResponseEntity.ok(ApiResponse.success("참여 가능한 챌린지 조회 성공", response));
+    }
+    //참여중인 챌린지
+    @GetMapping("/attend")
+    public ResponseEntity<ApiResponse<AttendChallengeResponse>> attendChallenge(
+            @AuthenticationPrincipal Long memberId)
+    {
+        AttendChallengeResponse response = memberChallengeServcie.attendChallenge(memberId);
+        return ResponseEntity.ok(ApiResponse.success("참여중인 챌린지 조회 성공",response));
+    }
+    //참여 완료 챌린지
+    @GetMapping("/end")
+    public ResponseEntity<ApiResponse<EndChallengeResponse>> endChallenge(
+            @AuthenticationPrincipal Long memberId)
+    {
+        EndChallengeResponse response = memberChallengeServcie.endChallenge(memberId);
+        return ResponseEntity.ok(ApiResponse.success("참여 완료 챌린지 조회 성공",response));
+    }
+
+
+
+}

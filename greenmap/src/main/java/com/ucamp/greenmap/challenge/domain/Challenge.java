@@ -26,14 +26,14 @@ public class Challenge extends BaseEntity {
     private String description;
 
     @Column(name = "member_count", nullable = false)
-    private Integer memberCount;
+    private Long memberCount;
 
     @Column(name = "deadline", nullable = false)
-    private Integer deadline;
+    private Long deadline;
 
     @Column(name = "success", nullable = false)
-    private Integer success;
+    private Long success;
 
     @Column(name = "point_amount", nullable = false)
-    private Integer pointAmount;
+    private Long pointAmount;
 }

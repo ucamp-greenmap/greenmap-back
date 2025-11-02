@@ -6,6 +6,7 @@ import com.ucamp.greenmap.image.repository.ImageRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -25,14 +26,16 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
 
+    @Transactional
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
+        System.out.println("OAuth2 Success Handler 실행됨");
+
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        // ✅ 카카오 JSON 구조 가져오기
         Long kakaoId = oAuth2User.getAttribute("id");
         Map<String, Object> properties = oAuth2User.getAttribute("properties");
         Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
@@ -45,13 +48,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             profileImageUrl = "https://em-content.zobj.net/thumbs/120/apple/325/leaf-fluttering-in-wind_1f343.png";
         }
 
-        // ✅ 이메일 없으면 kakao:{id} 사용
         String principal = Optional.ofNullable(email).orElse("kakao:" + kakaoId);
 
-        // ✅ 기존 유저 조회
         Member user = userRepository.findByEmail(principal).orElse(null);
 
-        // ✅ 신규 유저면 저장
         if (user == null) {
             Image img = new Image(profileImageUrl);
             imageRepository.save(img);
@@ -65,21 +65,25 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
             userRepository.save(user);
         } else {
-            // ✅ 기존유저 프로필 이미지 갱신
             Image img = user.getImage();
-            if (img != null && !img.getImageUrl().equals(profileImageUrl)) {
-                img.setImageUrl(profileImageUrl);
-                imageRepository.save(img);
+            if (img != null) {
+                String currentUrl = img.getImageUrl(); // LAZY 초기화
+                if (!currentUrl.equals(profileImageUrl)) {
+                    img.setImageUrl(profileImageUrl);
+                    imageRepository.save(img);
+                }
             }
         }
 
-        // ✅ JWT 발급
+        // (신규/기존 유저 모두) JWT 발급
         String accessToken = jwtTokenProvider.accessTokenGenerate(
-                user.getEmail(),
-                new Date(System.currentTimeMillis() + 1000L * 60 * 60) // 1h
+                user.getMemberId(),
+                new Date(System.currentTimeMillis() + 1000L * 60 * 60) // 1시간
         );
 
-        // ✅ 프론트로 리다이렉트 + 토큰 전달
-        response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
+        // Frontend redirect
+        if (!response.isCommitted()) {
+            response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
+        }
     }
 }
