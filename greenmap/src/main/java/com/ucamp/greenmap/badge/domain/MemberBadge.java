@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,5 +32,6 @@ public class MemberBadge extends BaseEntity {
 
     public void updateBadge(Badge badge) {
         this.badge = badge;
+        this.updatedAt = LocalDateTime.now();
     }
 }

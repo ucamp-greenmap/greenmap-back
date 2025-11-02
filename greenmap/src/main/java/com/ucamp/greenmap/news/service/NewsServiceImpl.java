@@ -168,7 +168,6 @@ public class NewsServiceImpl implements NewsService {
             ).orElseThrow();
             if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
                 memberBadge.updateBadge(nextBadge);
-                memberBadge.setUpdatedAt(LocalDateTime.now());
             }
 
             return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));

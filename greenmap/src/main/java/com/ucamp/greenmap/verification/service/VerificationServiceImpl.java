@@ -1,5 +1,9 @@
 package com.ucamp.greenmap.verification.service;
 
+import com.ucamp.greenmap.badge.domain.Badge;
+import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.BadgeRepository;
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
@@ -28,7 +32,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,6 +44,8 @@ public class VerificationServiceImpl implements VerificationService{
     private final PlaceRepository placeRepository;
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
+    private final BadgeRepository badgeRepository;
 
     @Override
     public VerificationResponse verifyBike(Long memberId, BikeRequest bikeRequest) {
@@ -58,8 +63,6 @@ public class VerificationServiceImpl implements VerificationService{
                 .build();
         validate.setCreatedAt(LocalDateTime.now());
         validateRepository.save(validate);
-
-
 
         // 필요한 엔티티 조회
         Place place = placeRepository.findById(1L).orElseThrow();
@@ -98,6 +101,15 @@ public class VerificationServiceImpl implements VerificationService{
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        Badge nextBadge = badgeRepository.findById(
+                memberBadge.getBadge().getBadgeId() != 5 ?
+                        memberBadge.getBadge().getBadgeId() + 1 : 5
+        ).orElseThrow();
+        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
+            memberBadge.updateBadge(nextBadge);
+        }
+
         // Response 반환
         return VerificationResponse.builder()
                 .point(pointAmount)
@@ -130,7 +142,7 @@ public class VerificationServiceImpl implements VerificationService{
                 .build();
 
         // Point, carbonSave 계산
-        long pointAmount = (long) ((double) carRequest.getChargeAmount() / 100);
+        long pointAmount = (long) ((double) carRequest.getChargeFee() / 100);
         long carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
 
         // History 생성 및 저장
@@ -159,6 +171,15 @@ public class VerificationServiceImpl implements VerificationService{
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
+
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        Badge nextBadge = badgeRepository.findById(
+                memberBadge.getBadge().getBadgeId() != 5 ?
+                        memberBadge.getBadge().getBadgeId() + 1 : 5
+        ).orElseThrow();
+        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
+            memberBadge.updateBadge(nextBadge);
+        }
 
         // Response 반환
         return VerificationResponse.builder()
@@ -229,6 +250,15 @@ public class VerificationServiceImpl implements VerificationService{
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
+
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        Badge nextBadge = badgeRepository.findById(
+                memberBadge.getBadge().getBadgeId() != 5 ?
+                        memberBadge.getBadge().getBadgeId() + 1 : 5
+        ).orElseThrow();
+        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
+            memberBadge.updateBadge(nextBadge);
+        }
 
         // Response 반환
         return VerificationResponse.builder()
