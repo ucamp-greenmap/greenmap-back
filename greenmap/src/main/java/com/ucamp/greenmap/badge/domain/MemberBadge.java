@@ -27,4 +27,8 @@ public class MemberBadge extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "badge_id")
     private Badge badge;
+
+    public void updateBadge(Badge badge) {
+        this.badge = badge;
+    }
 }
