@@ -77,7 +77,7 @@ public class NewsServiceImpl implements NewsService {
      * @return 뉴스 검색 결과
      */
     @Override
-    public ResponseEntity<ApiResponse<NewsResponse>> searchNews() {
+    public NewsResponse searchNews() {
 
         // WebClient를 사용하여 네이버 뉴스 검색 API 호출
         NewsResponse newsResponse = webClient.get()
@@ -103,7 +103,7 @@ public class NewsServiceImpl implements NewsService {
 
         // API 응답 검증
         if (newsResponse == null) {
-            return ResponseEntity.ok(ApiResponse.error("뉴스 조회에 실패했습니다. API 응답이 없습니다."));
+            throw new RuntimeException("뉴스 검색 API 응답이 null입니다.");
         }
 
         // 받아온 뉴스들 중 4개만 남기기
@@ -120,12 +120,12 @@ public class NewsServiceImpl implements NewsService {
         }
 
         // 성공 응답 반환
-        return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스 목록을 조회했습니다.", newsResponse));
+        return newsResponse;
 
     }
 
     @Override
-    public ResponseEntity<ApiResponse<String>> viewNews(NewsRequest request) {
+    public String viewNews(NewsRequest request) {
 
         // 필요한 엔티티 생성 및 조회
         Member member = Member.builder()
@@ -168,7 +168,7 @@ public class NewsServiceImpl implements NewsService {
         }
 
         // 성공 응답 반환
-        return ResponseEntity.ok(ApiResponse.success("성공적으로 뉴스를 조회했습니다."));
+        return "성공적으로 뉴스를 조회했습니다.";
     }
 
     // HTML 태그 제거 메서드 (현재 미사용)
