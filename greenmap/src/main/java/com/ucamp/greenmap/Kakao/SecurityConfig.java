@@ -31,7 +31,7 @@ public class SecurityConfig {
                                 "/",                    // 홈
                                 "/map/**",              // 지도 화면
                                 "/place/**",            // 장소 조회 API
-                                "/news",                // 뉴스
+                                "/news/**",                // 뉴스
                                 "/member/login",        // 로그인 페이지 API
                                 "/member/findPw",       // 비밀번호 찾기
                                 "/member/signup",       // 회원가입 (혹시 필요하면)
