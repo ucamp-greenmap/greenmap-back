@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
+
 public class BookmarkRequest {
     private Long bookmarkId;
     private Member member;

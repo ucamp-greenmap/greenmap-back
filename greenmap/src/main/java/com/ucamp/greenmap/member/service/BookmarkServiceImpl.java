@@ -3,6 +3,7 @@ package com.ucamp.greenmap.member.service;
 import com.ucamp.greenmap.member.domain.Bookmark;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.member.dto.request.BookmarkRequest;
+import com.ucamp.greenmap.member.dto.response.BookmarkListResponse;
 import com.ucamp.greenmap.member.dto.response.BookmarkResponse;
 import com.ucamp.greenmap.member.repository.BookmarkRepository;
 import com.ucamp.greenmap.member.repository.MemberRepository;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -57,5 +59,33 @@ public class BookmarkServiceImpl implements BookmarkService {
                 .bookmarked(false)
                 .build();
         }
+
+    @Override
+    public List<BookmarkListResponse> getMyBookmarks(Long memberId) {
+
+        List<Bookmark> bookmarks = bookmarkRepository.findByMember_MemberId(memberId);
+
+        return bookmarks.stream()
+                .map(b -> {
+                    var place = b.getPlace();
+                    var opening = place.getOpeningHours();
+
+                    return BookmarkListResponse.builder()
+                            .placeId(place.getPlaceId())
+                            .placeName(place.getPlaceName())
+                            .address(place.getAddress())
+                            .detailAddress(place.getDetailAddress())
+                            .locationX(place.getLocationX())
+                            .locationY(place.getLocationY())
+                            .telNum(place.getTelNum())
+                            .weekdayOpen(opening != null ? opening.getWeekdayOpen() : null)
+                            .weekdayClose(opening != null ? opening.getWeekdayClose() : null)
+                            .weekendOpen(opening != null ? opening.getWeekendOpen() : null)
+                            .weekendClose(opening != null ? opening.getWeekendClose() : null)
+                            .openingDays(opening != null ? opening.getOpeningDays() : null)
+                            .build();
+                })
+                .toList();
+    }
 
 }
