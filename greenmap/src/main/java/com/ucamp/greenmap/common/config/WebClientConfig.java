@@ -1,5 +1,6 @@
 package com.ucamp.greenmap.common.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import javax.net.ssl.SSLException;
 import java.time.Duration;
 
 
+@Slf4j
 @Configuration
 public class WebClientConfig {
 
@@ -26,6 +28,11 @@ public class WebClientConfig {
         return WebClient.builder()
                 .baseUrl(naverUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .filter((request, next) -> {
+                    log.info("Request URL: " + request.url());
+                    log.info("Headers: " + request.headers());
+                    return next.exchange(request);
+                })
                 .build();
     }
 
@@ -48,6 +55,31 @@ public class WebClientConfig {
                         HttpClient.create().responseTimeout(Duration.ofSeconds(timeoutSec))
                 ))
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.ALL_VALUE)
+                .build();
+    }
+
+    @Value("${seoul.bike-api-url}")
+    private String bikeUrl;
+
+    @Bean
+    public WebClient bikeWebClient() {
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(10 * 1024 * 1024)
+                )
+                .build();
+
+
+        return WebClient.builder()
+                .baseUrl(bikeUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .filter((request, next) -> {
+                    log.info("Request URL: " + request.url());
+                    log.info("Headers: " + request.headers());
+                    return next.exchange(request);
+                })
+                .exchangeStrategies(strategies)
                 .build();
     }
 }

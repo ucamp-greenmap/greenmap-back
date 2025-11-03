@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -98,8 +99,8 @@ public class NewsServiceImpl implements NewsService {
                     return Mono.error(new RuntimeException("Server Error가 발생했습니다."));
                 })
                 .bodyToMono(NewsResponse.class)
+                .timeout(Duration.ofSeconds(10))
                 .block();
-
 
         // API 응답 검증
         if (newsResponse == null) {

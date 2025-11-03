@@ -2,6 +2,7 @@ package com.ucamp.greenmap.place.controller;
 
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.place.dto.response.PlaceDetailResponse;
+import com.ucamp.greenmap.place.service.BikeService;
 import com.ucamp.greenmap.place.service.KepcoEvIngestService;
 import com.ucamp.greenmap.place.service.PlaceService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ public class PlaceController {
 
     private final PlaceService placeService;
     private final KepcoEvIngestService kepcoEvIngestService;
+    private final BikeService bikeService;
 
     @GetMapping("/{placeId}")
     public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetails(
@@ -37,5 +39,10 @@ public class PlaceController {
                 "addr", addr,
                 "changed", changed
         ));
+    }
+
+    @GetMapping("/bike")
+    public ResponseEntity<ApiResponse<String>> syncBikeStation() {
+        return ResponseEntity.ok(ApiResponse.success(bikeService.saveBikeStations()));
     }
 }
