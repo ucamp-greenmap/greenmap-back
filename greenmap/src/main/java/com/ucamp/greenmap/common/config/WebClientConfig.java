@@ -58,14 +58,14 @@ public class WebClientConfig {
                 .build();
     }
 
-//    @Value("${seoul.bike-api-url}")
-//    private String bikeUrl;
-//
-//    @Bean
-//    public WebClient bikeWebClient() {
-//        return WebClient.builder()
-//                .baseUrl(bikeUrl)
-//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .build();
-//    }
+    @Value("${seoul.bike-api-url}")
+    private String bikeUrl;
+
+    @Bean
+    public WebClient bikeWebClient() {
+        return WebClient.builder()
+                .baseUrl(bikeUrl)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
 }
