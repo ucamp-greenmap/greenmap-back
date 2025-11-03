@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,8 @@ public class BikeServiceImpl implements BikeService {
         BikeResponse response4 = fetch(3001, 4000);
         List<BikeResponse> responses = List.of(response1, response2, response3, response4);
 
+        log.info("따릉이 대여소 정보 fetch 완료");
+
         // id 기준 중복 제거
         Map<String, BikeResponse.BaseInfo.BikeStation> bikeStationMap = new LinkedHashMap<>();
         for (BikeResponse response : responses) {
@@ -56,6 +59,8 @@ public class BikeServiceImpl implements BikeService {
                 bikeStationMap.putIfAbsent(bs.getStationId(), bs);
             }
         }
+
+        log.info("중복 제거 완료");
 
         // DB에 저장
         Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(() -> new IllegalStateException("BIKE 카테고리가 DB에 없습니다."));
@@ -81,18 +86,23 @@ public class BikeServiceImpl implements BikeService {
                                     .build()
                     ));
         }
+        log.info("따릉이 대여소 정보 DB 저장 완료");
 
         return "따릉이 대여소 정보 저장 완료";
     }
 
     private BikeResponse fetch(int start, int end) {
-        return bikeClient.get()
+        LocalDateTime startTime = LocalDateTime.now();
+        BikeResponse response = bikeClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/{apikey}/json/tbCycleStationInfo/{start}/{end}/")
                         .build(apikey, start, end))
                 .retrieve()
                 .bodyToMono(BikeResponse.class)
-                .timeout(Duration.ofSeconds(20))
+//                .timeout(Duration.ofSeconds(20))
                 .block();
+        LocalDateTime endTime = LocalDateTime.now();
+        log.info("따릉이 대여소 정보 fetch 완료 (start: {}, end: {}, 소요시간: {}초)", start, end, Duration.between(startTime, endTime).toSeconds());
+        return response;
     }
 }
