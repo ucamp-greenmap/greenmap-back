@@ -92,7 +92,7 @@ public class BikeServiceImpl implements BikeService {
                         .build(apikey, start, end))
                 .retrieve()
                 .bodyToMono(BikeResponse.class)
-                .timeout(Duration.ofSeconds(10))
+                .timeout(Duration.ofSeconds(20))
                 .block();
     }
 }
