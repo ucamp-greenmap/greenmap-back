@@ -57,7 +57,7 @@ public class SecurityConfig {
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("http://localhost:5173/login")
+                        .logoutSuccessUrl("https://greenmap-api-1096735261131.asia-northeast3.run.app/login")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 );
