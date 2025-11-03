@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
 
                 .sessionManagement(session ->
-                        session.sessionFixation().newSession() // 새로운 로그인마다 세션 새로 생성
+                        session.sessionFixation().newSession()
                 )
 
                 .authorizeHttpRequests(auth -> auth
@@ -46,10 +46,10 @@ public class SecurityConfig {
 
                 .oauth2Login(oauth -> oauth
                         .authorizationEndpoint(endpoint ->
-                                endpoint.baseUri("/oauth2/authorization") // ✅ 명시
+                                endpoint.baseUri("/oauth2/authorization")
                         )
                         .redirectionEndpoint(endpoint ->
-                                endpoint.baseUri("/login/oauth2/code/*") // ✅ 반드시 명시
+                                endpoint.baseUri("/login/oauth2/code/*")
                         )
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)
@@ -57,7 +57,7 @@ public class SecurityConfig {
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("http://localhost:5173/login")
+                        .logoutSuccessUrl("https://greenmap-api-1096735261131.asia-northeast3.run.app/login")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 );
