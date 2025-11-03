@@ -83,7 +83,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // Frontend redirect
         if (!response.isCommitted()) {
-            response.sendRedirect("https://greenmap-api-1096735261131.asia-northeast3.run.app/login/success?token=" + accessToken);
+            response.sendRedirect("https://greenmap-ucamp.netlify.app/login/success?token=" + accessToken);
+            //response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
         }
     }
 }
