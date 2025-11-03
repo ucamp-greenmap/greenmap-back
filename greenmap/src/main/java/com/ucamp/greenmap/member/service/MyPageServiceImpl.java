@@ -52,6 +52,7 @@ public class MyPageServiceImpl implements MyPageService {
 
     @Override
     public RecodeResponse getRecode(Long memberId) {
+        MemberResponse member = memberService.getMyInfo(memberId);
 
         Integer curVerify = historyRepository.countThisMonth(memberId);
         Integer prevVerify = historyRepository.countLastMonth(memberId);
@@ -59,6 +60,7 @@ public class MyPageServiceImpl implements MyPageService {
         var top = historyRepository.mostActiveCategoryThisMonth(memberId);
 
         return RecodeResponse.builder()
+                .memberId(member.getMemberId())
                 .verifyTimes(curVerify != null ? curVerify : 0)
                 .timesDiff((curVerify != null ? curVerify : 0) -
                         (prevVerify != null ? prevVerify : 0))
