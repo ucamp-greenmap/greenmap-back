@@ -31,7 +31,7 @@ public class BadgeServiceImpl implements BadgeService {
         return BadgeResponse.builder()
                 .name(badge.getBadgeName())
                 .wholePoint(point.getWholePoint())
-                .currentPoint((long) badge.getRequirement())
+                .currentPoint(badge.getRequirement())
                 .description(badge.getDescription())
                 .image_url(badge.getImage().getImageUrl())
                 .created_at(badge.getCreatedAt())
