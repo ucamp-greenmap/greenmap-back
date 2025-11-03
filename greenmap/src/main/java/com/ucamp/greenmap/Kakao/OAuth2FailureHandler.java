@@ -18,7 +18,7 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
 
         System.out.println("OAuth2 Login Failed: " + exception.getMessage());
 
-        response.sendRedirect("http://localhost:5173/login?error=oauth_failed");
+        response.sendRedirect("https://greenmap-api-1096735261131.asia-northeast3.run.app/login?error=oauth_failed");
     }
 }
 
