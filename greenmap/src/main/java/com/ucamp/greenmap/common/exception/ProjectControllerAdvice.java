@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -12,9 +14,10 @@ import java.util.stream.Collectors;
 public class ProjectControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<String>> handleException(Exception e) {
-        String stackTrace = Arrays.stream(e.getStackTrace())
-                .map(StackTraceElement::toString)
-                .collect(Collectors.joining("\n"));
-        return ResponseEntity.ok(ApiResponse.error("서버 오류:\n" + stackTrace));
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        String stackTraceString = sw.toString();
+
+        return ResponseEntity.ok(ApiResponse.error("서버 오류:\n" + stackTraceString));
     }
 }
