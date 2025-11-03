@@ -32,14 +32,16 @@ public class SecurityConfig {
                                 "/map/**",              // 지도 화면
                                 "/place/**",            // 장소 조회 API
                                 "/news/**",                // 뉴스
-                                "/member/login",        // 로그인 페이지 API
                                 "/member/findPw",       // 비밀번호 찾기
                                 "/member/signup",       // 회원가입 (혹시 필요하면)
-                                "/login/oauth2/**",
-                                "/oauth2/**",
                                 "/login/success",
                                 "/error",
-                                "/favicon.ico"
+                                "/favicon.ico",
+                                "/oauth2/**",
+                                "/login/**",// 로그인 페이지 API
+                                "/login/oauth2/**",
+                                "https://greenmap-ucamp.netlify.app/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -57,7 +59,7 @@ public class SecurityConfig {
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("https://greenmap-api-1096735261131.asia-northeast3.run.app/login")
+                        .logoutSuccessUrl("https://greenmap-ucamp.netlify.app/login")
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
                 );
