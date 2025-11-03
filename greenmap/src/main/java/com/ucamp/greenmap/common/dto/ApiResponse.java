@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiResponse<T>(
@@ -20,7 +21,7 @@ public record ApiResponse<T>(
 
     // ✅ 성공 응답 (데이터 없음)
     public static <T> ApiResponse<T> success(String message) {
-        return new ApiResponse<>(Status.SUCCESS, message, null, LocalDateTime.now());
+        return new ApiResponse<>(Status.SUCCESS, message, null, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
     }
 
     // ✅ 성공 응답 (데이터 포함)
