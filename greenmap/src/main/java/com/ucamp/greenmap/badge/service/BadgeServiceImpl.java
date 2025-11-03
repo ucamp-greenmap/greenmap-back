@@ -24,16 +24,14 @@ public class BadgeServiceImpl implements BadgeService {
         // 현재 멤버의 뱃지 정보 조회
         MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
         // 필요한 정보들 조회
-        Long nowBadgeId = memberBadge.getBadge().getBadgeId();
-        Badge badge = badgeRepository.findById(nowBadgeId).orElseThrow();
-        Badge nextBadge = badgeRepository.findById(nowBadgeId != 5 ? nowBadgeId + 1 : 5).orElseThrow();
+        Badge badge = badgeRepository.findById(memberBadge.getBadge().getBadgeId()).orElseThrow();
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
 
         // 응답 생성
         return BadgeResponse.builder()
                 .name(badge.getBadgeName())
                 .wholePoint(point.getWholePoint())
-                .nextPoint((long) nextBadge.getRequirement())
+                .currentPoint(badge.getRequirement())
                 .description(badge.getDescription())
                 .image_url(badge.getImage().getImageUrl())
                 .created_at(badge.getCreatedAt())

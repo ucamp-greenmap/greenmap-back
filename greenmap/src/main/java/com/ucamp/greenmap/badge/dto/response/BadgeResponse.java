@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class BadgeResponse {
     private String name;
     private Long wholePoint;
-    private Long nextPoint;
+    private Long currentPoint;
     private String description;
     private String image_url;
     private LocalDateTime created_at;

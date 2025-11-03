@@ -30,7 +30,7 @@ public class Badge extends BaseEntity {
     private String badgeName;
 
     @Column(name = "requirement", nullable = false)
-    private Integer requirement;
+    private Long requirement;
 
     @Column(name = "description")
     private String description;
