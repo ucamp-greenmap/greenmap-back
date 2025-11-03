@@ -185,6 +185,31 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .build();
     }
 
+    @Override
+    public ProgressResponse progressChallenge(Long memberId, Long memberChallengeId, Long progress) {
+
+        MemberChallenge memberChallenge = memberChallengeRepository
+                .findChallengeByMember(memberId, memberChallengeId)
+                .orElseThrow(() -> new RuntimeException("해당 챌린지가 존재하지 않거나 회원 소유가 아닙니다."));
+
+        memberChallenge.updateProgress(progress);
+
+        MemberChallenge updated = memberChallengeRepository.save(memberChallenge);
+
+        return ProgressResponse.builder()
+                .memberChallengeId(updated.getMemberChallengeId())
+                .memberId(updated.getMember().getMemberId())
+                .challengeId(updated.getChallenge().getChallengeId())
+                .progress(updated.getProgress())
+                .isActive(updated.getIsActive())
+                .build();
+    }
+
+
+
+
+
+
 
 
 }

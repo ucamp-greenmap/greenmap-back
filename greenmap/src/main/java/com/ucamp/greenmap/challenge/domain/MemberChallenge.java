@@ -31,5 +31,19 @@ public class MemberChallenge extends BaseEntity {
     @Column(name = "progress", nullable = false)
     private Long progress;
 
+    public void updateProgress(Long progress) {
+        this.progress = progress;
+
+        if (progress >= 100) {
+            this.isActive = Boolean.FALSE;  // 완료
+        } else {
+            this.isActive = Boolean.TRUE;   // 진행중
+        }
+    }
+
+
+
+
+
 
 }
