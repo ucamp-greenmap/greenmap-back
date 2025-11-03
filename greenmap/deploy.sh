@@ -28,9 +28,9 @@ docker stop greenmap 2>/dev/null && docker rm greenmap 2>/dev/null
 
 # 새 이미지 빌드
 echo -e "\n${GREEN}3. Building new Docker image...${NC}"
-# 코드 변경이 있을 때만 리빌드 (BuildKit 사용)
-export DOCKER_BUILDKIT=1
-docker build -t greenmap-app . --progress=plain
+# BuildKit 비활성화 (buildx 컴포넌트 없이 빌드)
+export DOCKER_BUILDKIT=0
+docker build -t greenmap-app .
 
 # 환경변수 파일로 컨테이너 실행
 echo -e "\n${GREEN}4. Starting new container with .env file...${NC}"
