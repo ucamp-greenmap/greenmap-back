@@ -27,6 +27,29 @@ jobs:
             - name: Cloud SDK 설정
               uses: google-github-actions/setup-gcloud@v2
 
+            - name: VM에 .env 파일 생성
+              run: |
+                  gcloud compute ssh ${{ env.VM_INSTANCE }} \
+                    --zone=${{ env.VM_ZONE }} \
+                    --command="cd ~/greenmap-back/greenmap && cat > .env << 'EOF'
+                  DB_URL=${{ secrets.DB_URL }}
+                  DB_USERNAME=${{ secrets.DB_USERNAME }}
+                  DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+                  JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}
+                  JWT_MS=${{ secrets.JWT_MS }}
+                  KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+                  KAKAO_REDIRECT_URI=${{ secrets.KAKAO_REDIRECT_URI }}
+                  KAKAO_REDIRECT_LOCAL=${{ secrets.KAKAO_REDIRECT_LOCAL }}
+                  KAKAO_REDIRECT_PROD=${{ secrets.KAKAO_REDIRECT_PROD }}
+                  CLIENT_ID=${{ secrets.CLIENT_ID }}
+                  CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+                  KEPCO_API_KEY=${{ secrets.KEPCO_API_KEY }}
+                  SEOUL_BIKE_API_KEY=${{ secrets.SEOUL_BIKE_API_KEY }}
+                  SPRING_PROFILES_ACTIVE=prod
+                  EOF
+                  chmod 600 .env" \
+                    --quiet
+
             - name: VM에 SSH로 배포 실행
               run: |
                   gcloud compute ssh ${{ env.VM_INSTANCE }} \
