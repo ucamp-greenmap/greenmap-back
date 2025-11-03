@@ -19,6 +19,7 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         System.out.println("OAuth2 Login Failed: " + exception.getMessage());
 
         response.sendRedirect("https://greenmap-ucamp.netlify.app/login?error=oauth_failed");
+        //response.sendRedirect("http://localhost:5173/login?error=oauth_failed");
     }
 }
 
