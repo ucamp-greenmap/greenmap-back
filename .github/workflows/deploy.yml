@@ -65,7 +65,7 @@ jobs:
                     --min-instances 0 \
                     --max-instances 10 \
                     --port 8080 \
-                    --timeout 300 \
+                    --timeout 600 \
                     --cpu-boost \
                     --no-cpu-throttling
 
