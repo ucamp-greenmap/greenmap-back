@@ -38,7 +38,29 @@ docker run -d \
   --env-file .env \
   greenmap-app
 
-# 로그 확인
-echo -e "\n${GREEN}5. Showing container logs (Ctrl+C to exit)...${NC}"
+# 로그 확인 및 헬스체크
+echo -e "\n${GREEN}5. Showing recent container logs and performing health check...${NC}"
 sleep 3
-docker logs -f greenmap
+docker logs --tail 200 greenmap || true
+
+echo -e "\n${GREEN}6. Waiting for application health on http://localhost:8080/actuator/health ...${NC}"
+MAX_RETRIES=30
+SLEEP_SECONDS=2
+for i in $(seq 1 $MAX_RETRIES); do
+  if curl -sSf http://localhost:8080/actuator/health >/dev/null; then
+    echo -e "${GREEN}Application is healthy${NC}"
+    break
+  else
+    echo -e "${BLUE}Waiting for app... ($i/$MAX_RETRIES)${NC}"
+    sleep $SLEEP_SECONDS
+  fi
+done
+
+if [ $i -gt $MAX_RETRIES ]; then
+  echo -e "${RED}Application did not become healthy in time.${NC}"
+  echo -e "\n${RED}Last 500 lines of container logs:${NC}"
+  docker logs --tail 500 greenmap || true
+  exit 1
+fi
+
+echo -e "\n${GREEN}Deployment finished successfully.${NC}"
