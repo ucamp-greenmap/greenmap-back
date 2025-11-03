@@ -31,7 +31,14 @@ jobs:
               run: |
                   gcloud compute ssh cebu13@${{ env.VM_INSTANCE }} \
                     --zone=${{ env.VM_ZONE }} \
-                    --command="cd ~/greenmap-back/greenmap && chmod +x deploy.sh && ./deploy.sh" \
+                    --command="
+                      echo '현재 디렉토리:' && pwd &&
+                      echo '홈 디렉토리 내용:' && ls -la ~/ &&
+                      echo 'greenmap-back 디렉토리 확인:' && ls -la ~/greenmap-back/ &&
+                      cd greenmap-back/greenmap && 
+                      chmod +x deploy.sh && 
+                      ./deploy.sh
+                    " \
                     --quiet
 
             - name: 배포 결과 확인
