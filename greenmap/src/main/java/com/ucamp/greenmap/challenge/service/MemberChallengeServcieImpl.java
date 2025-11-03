@@ -7,9 +7,11 @@ import com.ucamp.greenmap.challenge.repository.ChallengeRepository;
 import com.ucamp.greenmap.challenge.repository.MemberChallengeRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.member.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,6 +148,42 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
 
     }
 
+    @Override
+    @Transactional
+    public EndDateChallengeResponse endDateChallenge(Long memberId) {
+
+        // 1. 회원 확인
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
+
+        // 2. 마감 지난 챌린지 조회 (만료될 챌린지들)
+        List<MemberChallenge> expiredBeforeUpdate =
+                memberChallengeRepository.findExpiredChallenges(memberId);
+
+        if (expiredBeforeUpdate.isEmpty()) {
+            return EndDateChallengeResponse.builder()
+                    .memberId(memberId)
+                    .build(); // 만료된 챌린지 없으면 기본 반환
+        }
+
+        // 3. 만료 처리 실행 (isActive = false 업데이트)
+        memberChallengeRepository.updateExpiredChallenges(memberId);
+
+        // 4. 가장 최근에 만료된 챌린지 기준 (가장 늦게 끝난 챌린지)
+        MemberChallenge expired = expiredBeforeUpdate.get(0);
+
+        Challenge challenge = expired.getChallenge();
+
+        return EndDateChallengeResponse.builder()
+                .memberId(memberId)
+                .memberChallengeId(expired.getMemberChallengeId())
+                .challengeId(challenge.getChallengeId())
+                .challengeName(challenge.getChallengeName())
+                .progress(expired.getProgress())
+                .success(challenge.getSuccess())
+                .isActive(false)
+                .build();
+    }
 
 
 

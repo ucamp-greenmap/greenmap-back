@@ -1,10 +1,7 @@
 package com.ucamp.greenmap.challenge.controller;
 
 import com.ucamp.greenmap.challenge.dto.request.MemberChallengeDto;
-import com.ucamp.greenmap.challenge.dto.response.AttendChallengeResponse;
-import com.ucamp.greenmap.challenge.dto.response.ChallengeAvailResponse;
-import com.ucamp.greenmap.challenge.dto.response.EndChallengeResponse;
-import com.ucamp.greenmap.challenge.dto.response.MemberChallengeregis;
+import com.ucamp.greenmap.challenge.dto.response.*;
 import com.ucamp.greenmap.challenge.service.MemberChallengeServcieImpl;
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import io.swagger.models.Response;
@@ -57,6 +54,15 @@ public class MemberChallengeController {
         EndChallengeResponse response = memberChallengeServcie.endChallenge(memberId);
         return ResponseEntity.ok(ApiResponse.success("참여 완료 챌린지 조회 성공",response));
     }
+
+    @PutMapping("/endDate")
+    public ResponseEntity<ApiResponse<EndDateChallengeResponse>> endDateChallenge(
+            @AuthenticationPrincipal Long memberId)
+    {
+        EndDateChallengeResponse response = memberChallengeServcie.endDateChallenge(memberId);
+        return ResponseEntity.ok(ApiResponse.success("기한지난 챌린지 자동 종료", response));
+    }
+
 
 
 
