@@ -42,11 +42,16 @@ public class BikeServiceImpl implements BikeService {
 
     @Override
     public String saveBikeStations() {
+        log.info("여기까진 왔겠지 설마");
         // 따릉이 대여소 정보는 총 3200개, 1000개 단위로 나누어 fetch
         BikeResponse response1 = fetch(1, 1000);
+        log.info("fetch 1개");
         BikeResponse response2 = fetch(1001, 2000);
+        log.info("fetch 1개");
         BikeResponse response3 = fetch(2001, 3000);
+        log.info("fetch 1개");
         BikeResponse response4 = fetch(3001, 4000);
+        log.info("fetch 1개");
         List<BikeResponse> responses = List.of(response1, response2, response3, response4);
 
         log.info("따릉이 대여소 정보 fetch 완료");
