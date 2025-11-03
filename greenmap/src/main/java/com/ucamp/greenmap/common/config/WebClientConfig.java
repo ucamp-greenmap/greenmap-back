@@ -73,7 +73,7 @@ public class WebClientConfig {
 
         return WebClient.builder()
                 .baseUrl(bikeUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .filter((request, next) -> {
                     log.info("Request URL: " + request.url());
                     log.info("Headers: " + request.headers());
