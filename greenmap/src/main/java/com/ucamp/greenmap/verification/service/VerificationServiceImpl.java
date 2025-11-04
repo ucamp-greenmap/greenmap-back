@@ -66,7 +66,8 @@ public class VerificationServiceImpl implements VerificationService{
         // 필요한 엔티티 조회
         Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(
                 () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        Place place = placeRepository.findById(1L).orElseThrow(() -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
+        Place place = placeRepository.findByCategoryId(category.getCategoryId()).orElseThrow(
+                () -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
                 .build();
@@ -98,7 +99,8 @@ public class VerificationServiceImpl implements VerificationService{
         pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
-        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(() -> new IllegalArgumentException("포인트 정보를 찾을 수 없습니다."));
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("포인트 정보를 찾을 수 없습니다."));
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
@@ -108,7 +110,7 @@ public class VerificationServiceImpl implements VerificationService{
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
                         memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow();
+        ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
         if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
             memberBadge.updateBadge(nextBadge);
         }
@@ -140,7 +142,8 @@ public class VerificationServiceImpl implements VerificationService{
         // 필요한 엔티티 조회
         Category category = categoryRepository.findByCategoryName(CategoryName.CAR).orElseThrow(
                 () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        Place place = placeRepository.findById(3L).orElseThrow(() -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
+        Place place = placeRepository.findByCategoryId(category.getCategoryId()).orElseThrow(
+                () -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
                 .build();
@@ -183,7 +186,7 @@ public class VerificationServiceImpl implements VerificationService{
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
                         memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow();
+        ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
         if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
             memberBadge.updateBadge(nextBadge);
         }
@@ -213,23 +216,21 @@ public class VerificationServiceImpl implements VerificationService{
         validateRepository.save(validate);
 
         // 필요한 엔티티 조회
+        String placeName = shopRequest.getName();
         CategoryName categoryName = null;
-        Long placeId = null;
         String description = null;
         if (shopRequest.getCategory().equals("recycle")) {
             categoryName = CategoryName.RECYCLING_CENTER;
-            placeId = 4L;
             description = "재활용센터 이용 인증";
         } else if (shopRequest.getCategory().equals("zero")) {
             categoryName = CategoryName.ZERO_WASTE;
-            placeId = 2L;
             description = "제로웨이스트 가게 이용 인증";
         } else {
             throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
         }
         Category category = categoryRepository.findByCategoryName(categoryName).orElseThrow(
                 () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        Place place = placeRepository.findById(placeId).orElseThrow(
+        Place place = placeRepository.findByPlaceName(placeName).orElseThrow(
                 () -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
@@ -267,11 +268,12 @@ public class VerificationServiceImpl implements VerificationService{
         point.addCarbonSaveTotal(carbonSave);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(() ->
+                new IllegalArgumentException("멤버 뱃지 정보를 찾을 수 없습니다."));
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
                         memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow();
+        ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
         if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
             memberBadge.updateBadge(nextBadge);
         }
@@ -293,7 +295,8 @@ public class VerificationServiceImpl implements VerificationService{
 
         // 각 인증 내역에 대해 PointHistory 조회 및 Response 형식으로 변환 (수정 필요)
         for (History history : historyList) {
-            PointHistory pointHistory = pointHistoryRepository.findByLogId(history.getHistoryId()).orElseThrow();
+            PointHistory pointHistory = pointHistoryRepository.findByLogId(history.getHistoryId()).orElseThrow(() ->
+                    new IllegalArgumentException("포인트 히스토리를 찾을 수 없습니다."));
             verificationHistoryItems.add(VerificationHistoryResponse.VerificationHistoryItem.builder()
                     .category(history.getCategory().getCategoryName().toString())
                     .createdAt(history.getCreatedAt().toString())
@@ -310,7 +313,8 @@ public class VerificationServiceImpl implements VerificationService{
     @Override
     public MonthlyVerificationResponse getMonthlyVerification(Long memberId) {
         // 이번달 Point 정보 조회
-        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("포인트 정보를 찾을 수 없습니다."));
 
         // Response 반환
         return MonthlyVerificationResponse.builder()
