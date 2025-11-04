@@ -22,26 +22,26 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
+
                 .sessionManagement(session ->
                         session.sessionFixation().newSession()
                 )
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/",                    // 홈
-                                "/map/**",              // 지도 화면
-                                "/place/**",            // 장소 조회 API
-                                "/news/**",                // 뉴스
-                                "/member/findPw",       // 비밀번호 찾기
-                                "/member/signup",       // 회원가입 (혹시 필요하면)
+                                "/",
+                                "/map/**",
+                                "/place/**",
+                                "/place",
+                                "/news/**",
+                                "/member/findPw",
+                                "/member/signup",
                                 "/login/success",
                                 "/error",
                                 "/favicon.ico",
                                 "/oauth2/**",
-                                "/login/**",// 로그인 페이지 API
-                                "/login/oauth2/**",
-                                "https://greenmap-ucamp.netlify.app/**"
-
+                                "/login/**",
+                                "/login/oauth2/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -68,5 +68,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }

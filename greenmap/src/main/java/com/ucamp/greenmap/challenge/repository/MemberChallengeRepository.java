@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberChallengeRepository extends JpaRepository<MemberChallenge,Long>{
 
     @Query("SELECT mc FROM MemberChallenge mc " +
             "JOIN mc.challenge c " +
-            "WHERE mc.member.memberId = :memberId")
+            "WHERE mc.member.memberId = :memberId AND mc.isActive = true")
     List<MemberChallenge> findAttendChallengesByMemberId(Long memberId);
 
     @Query("SELECT mc FROM MemberChallenge mc WHERE mc.member.memberId = :memberId AND mc.isActive = false")
@@ -39,6 +40,13 @@ SELECT mc.*
     ORDER BY DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) DESC
 """, nativeQuery = true)
     List<MemberChallenge> findExpiredChallenges(Long memberId);
+
+    @Query("SELECT mc FROM MemberChallenge mc " +
+            "WHERE mc.member.memberId = :memberId AND mc.memberChallengeId = :memberChallengeId")
+    Optional<MemberChallenge> findChallengeByMember(Long memberId, Long memberChallengeId);
+
+
+
 
 
 }

@@ -1,6 +1,7 @@
 package com.ucamp.greenmap.challenge.controller;
 
 import com.ucamp.greenmap.challenge.dto.request.MemberChallengeDto;
+import com.ucamp.greenmap.challenge.dto.request.ProgressUpdateRequest;
 import com.ucamp.greenmap.challenge.dto.response.*;
 import com.ucamp.greenmap.challenge.service.MemberChallengeServcieImpl;
 import com.ucamp.greenmap.common.dto.ApiResponse;
@@ -62,6 +63,21 @@ public class MemberChallengeController {
         EndDateChallengeResponse response = memberChallengeServcie.endDateChallenge(memberId);
         return ResponseEntity.ok(ApiResponse.success("기한지난 챌린지 자동 종료", response));
     }
+
+    @PutMapping
+    public ResponseEntity<ApiResponse<ProgressResponse>> progressChallenge(
+            @AuthenticationPrincipal Long memberId,
+            @RequestBody ProgressUpdateRequest request)
+    {
+        ProgressResponse response = memberChallengeServcie.progressChallenge(
+                memberId,
+                request.getMemberChallengeId(),
+                request.getTimes()
+        );
+
+        return ResponseEntity.ok(ApiResponse.success("진행률 수정완료", response));
+    }
+
 
 
 

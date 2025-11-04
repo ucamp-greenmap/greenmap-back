@@ -13,4 +13,9 @@ public interface MemberChallengeService {
     EndChallengeResponse endChallenge(Long memberId);
 
     EndDateChallengeResponse endDateChallenge(Long memberId);
+
+    ProgressResponse progressChallenge(Long memberId, Long memberChallengeId, Long progress);
+
+
+
 }
