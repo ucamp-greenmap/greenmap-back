@@ -26,16 +26,16 @@ public record ApiResponse<T>(
 
     // ✅ 성공 응답 (데이터 포함)
     public static <T> ApiResponse<T> success(String message, T data) {
-        return new ApiResponse<>(Status.SUCCESS, message, data, LocalDateTime.now());
+        return new ApiResponse<>(Status.SUCCESS, message, data, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
     }
 
     // ✅ 실패 응답 (데이터 없음)
     public static <T> ApiResponse<T> error(String message) {
-        return new ApiResponse<>(Status.ERROR, message, null, LocalDateTime.now());
+        return new ApiResponse<>(Status.ERROR, message, null, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
     }
 
     // ✅ 실패 응답 (데이터 포함)
     public static <T> ApiResponse<T> error(String message, T data) {
-        return new ApiResponse<>(Status.ERROR, message, data, LocalDateTime.now());
+        return new ApiResponse<>(Status.ERROR, message, data, LocalDateTime.now(ZoneId.of("Asia/Seoul")));
     }
 }
