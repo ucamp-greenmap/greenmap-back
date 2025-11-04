@@ -2,11 +2,13 @@ package com.ucamp.greenmap.place.controller;
 
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.place.dto.response.PlaceDetailResponse;
+import com.ucamp.greenmap.place.dto.response.PlaceListDto;
 import com.ucamp.greenmap.place.service.BikeService;
 import com.ucamp.greenmap.place.service.KepcoEvIngestService;
 import com.ucamp.greenmap.place.service.PlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -44,5 +46,15 @@ public class PlaceController {
     @GetMapping("/bike")
     public ResponseEntity<ApiResponse<String>> syncBikeStation() {
         return ResponseEntity.ok(ApiResponse.success(bikeService.saveBikeStations()));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<PlaceListDto>> getAllPlaces(
+            @AuthenticationPrincipal Long memberId,
+            @RequestParam(name = "longitude") Double longitude,
+            @RequestParam(name = "latitude") Double latitude
+    ) {
+        PlaceListDto response = placeService.getAllPlaces(memberId, longitude, latitude);
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 }
