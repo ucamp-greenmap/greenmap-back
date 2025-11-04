@@ -40,7 +40,7 @@ public class KepcoEvIngestService {
         List<KepcoEvResponse.EvStation> items = fetch(addrParam);
         if (items == null || items.isEmpty()) return 0;
 
-        Category carCategory = categoryRepository.findByCategoryName(CategoryName.CAR)
+        Category carCategory = categoryRepository.findByCategoryName(CategoryName.EVCAR)
                 .orElseThrow(() -> new IllegalStateException("CAR 카테고리가 DB에 없습니다."));
 
         // 1) csNm|addr 기준으로 중복 제거
