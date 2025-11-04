@@ -38,6 +38,8 @@ public class SecurityConfig {
                                                                 "/place",
                                                                 "/news/**",
                                                                 "/member",
+                                                                "/member/me",
+                                                                "/member/login",
                                                                 "/member/findPw",
                                                                 "/member/signup",
                                                                 "/login/success",
