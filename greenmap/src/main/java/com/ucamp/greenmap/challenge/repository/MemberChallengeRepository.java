@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,9 +42,12 @@ SELECT mc.*
 """, nativeQuery = true)
     List<MemberChallenge> findExpiredChallenges(Long memberId);
 
-    @Query("SELECT mc FROM MemberChallenge mc " +
-            "WHERE mc.member.memberId = :memberId AND mc.memberChallengeId = :memberChallengeId")
-    Optional<MemberChallenge> findChallengeByMember(Long memberId, Long memberChallengeId);
+    @Query("SELECT mc FROM MemberChallenge mc WHERE mc.member.memberId = :memberId AND mc.memberChallengeId = :memberChallengeId")
+    Optional<MemberChallenge> findChallengeByMember(
+            @Param("memberId") Long memberId,
+            @Param("memberChallengeId") Long memberChallengeId
+    );
+
 
 
 

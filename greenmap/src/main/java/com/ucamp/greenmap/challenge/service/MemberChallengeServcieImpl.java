@@ -210,36 +210,50 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .findChallengeByMember(memberId, memberChallengeId)
                 .orElseThrow(() -> new RuntimeException("해당 챌린지가 존재하지 않거나 회원 소유가 아닙니다."));
 
-        //  챌린지 목표 횟수 가져오기
-        Long goal = memberChallenge.getChallenge().getSuccess();
+        // 이미 완료된 챌린지면 그냥 현재 상태 반환
+        if (Boolean.FALSE.equals(memberChallenge.getIsActive())) {
+            return ProgressResponse.builder()
+                    .memberChallengeId(memberChallengeId)
+                    .memberId(memberId)
+                    .challengeId(memberChallenge.getChallenge().getChallengeId())
+                    .progress(memberChallenge.getProgress())
+                    .isActive(false)
+                    .build();
+        }
 
+        Long goal = memberChallenge.getChallenge().getSuccess();
         if (goal == null || goal <= 0) {
             throw new RuntimeException("챌린지 목표가 설정되지 않았습니다.");
         }
 
-        //  success 기반으로 진행률(%) 계산
-        Long progress = (long) Math.min(100,
-                Math.ceil((double) times / goal * 100));
+        // 이번 증가치 계산 = (추가 회수 / 목표) * 100
+        Long increaseProgress = (long) Math.ceil((double) times / goal * 100);
 
-        //  progress 업데이트
-        memberChallenge.updateProgress(progress);
+        // progress 누적
+        Long newProgress = memberChallenge.getProgress() + increaseProgress;
 
-        //  100% & 아직 활성 상태이면 포인트 지급
-        if (progress >= 100 && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
+        // 100 이상이면 100으로 고정
+        newProgress = Math.min(newProgress, 100);
+
+        // progress만 업데이트
+        memberChallenge.updateProgress(newProgress);
+
+        // 보상 조건: 처음 100 도달 & 아직 활성 상태인 경우
+        if (newProgress >= 100 && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
 
             Member member = memberChallenge.getMember();
             Challenge challenge = memberChallenge.getChallenge();
             Long rewardPoint = challenge.getPointAmount();
 
-            //  포인트 조회 & 업데이트
+            // 포인트 지급
             Point point = pointRepository.findByMember_MemberId(memberId)
                     .orElseThrow(() -> new RuntimeException("포인트 정보가 없습니다."));
             point.addPointChallenge(rewardPoint);
 
+            // 포인트 히스토리 기록
             Category category = categoryRepository.findByCategoryName(CategoryName.CHALLENGE)
-                    .orElseThrow();
+                    .orElseThrow(() -> new RuntimeException("해당 카테고리를 찾을 수 없습니다."));
 
-            //  PointHistory 기록
             PointHistory pointHistory = PointHistory.builder()
                     .member(member)
                     .category(category)
@@ -250,7 +264,8 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
             pointHistory.setCreatedAt(LocalDateTime.now());
             pointHistoryRepository.save(pointHistory);
 
-            //  뱃지 업데이트
+
+             //뱃지 업데이트
             MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId)
                     .orElseThrow();
             Badge nextBadge = badgeRepository.findById(
@@ -263,7 +278,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 memberBadge.updateBadge(nextBadge);
             }
 
-            //  챌린지 완료 처리
+            // 챌린지 완료 처리 (여기서만 isActive 바꿈)
             memberChallenge.completeChallenge();
         }
 
@@ -277,9 +292,6 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .isActive(updated.getIsActive())
                 .build();
     }
-
-
-
 
 
 
