@@ -22,10 +22,13 @@ public class BadgeServiceImpl implements BadgeService {
     @Override
     public BadgeResponse searchBadges(Long memberId) {
         // 현재 멤버의 뱃지 정보 조회
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("멤버 뱃지 정보가 없습니다."));
         // 필요한 정보들 조회
-        Badge badge = badgeRepository.findById(memberBadge.getBadge().getBadgeId()).orElseThrow();
-        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
+        Badge badge = badgeRepository.findById(memberBadge.getBadge().getBadgeId()).orElseThrow(
+                () -> new IllegalArgumentException("뱃지 정보가 없습니다."));
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("포인트 정보가 없습니다."));
 
         // 응답 생성
         return BadgeResponse.builder()
