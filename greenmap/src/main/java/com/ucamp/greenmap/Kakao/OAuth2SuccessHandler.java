@@ -4,6 +4,8 @@ import com.ucamp.greenmap.Kakao.repository.UserRepository;
 import com.ucamp.greenmap.image.domain.Image;
 import com.ucamp.greenmap.image.repository.ImageRepository;
 import com.ucamp.greenmap.member.domain.Member;
+import com.ucamp.greenmap.point.domain.Point;
+import com.ucamp.greenmap.point.repository.PointRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -26,6 +28,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
+    private final PointRepository pointRepository;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -67,7 +70,19 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             user.setPassword("SOCIAL_LOGIN");
             user.setImage(img);
 
-            userRepository.save(user);
+            Member saved = userRepository.save(user);
+            Point point = Point.builder()
+                    .member(saved)
+                    .point(0L)
+                    .monthPoint(0L)
+                    .usedPoint(0L)
+                    .wholePoint(0L)
+                    .carbonSaveTotal(0L)
+                    .pointTimes(0L)
+                    .wholePointTimes(0L)
+                    .build();
+
+            pointRepository.save(point);
         } else {
             Image img = user.getImage();
             if (img != null) {
