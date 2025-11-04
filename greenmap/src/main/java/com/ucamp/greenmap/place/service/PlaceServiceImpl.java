@@ -4,6 +4,8 @@ import com.ucamp.greenmap.member.repository.BookmarkRepository;
 import com.ucamp.greenmap.place.domain.OpeningHours;
 import com.ucamp.greenmap.place.domain.Place;
 import com.ucamp.greenmap.place.dto.response.PlaceDetailResponse;
+import com.ucamp.greenmap.place.dto.response.PlaceDto;
+import com.ucamp.greenmap.place.dto.response.PlaceListDto;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,13 +53,36 @@ public class PlaceServiceImpl implements PlaceService {
                 .build();
     }
 
-    private double parseDoubleSafe(String s) {
-        if (s == null || s.isBlank()) return 0.0;
-        try {
-            return Double.parseDouble(s.trim());
-        } catch (NumberFormatException e) {
-            return 0.0;
-        }
+    @Override
+    public PlaceListDto getAllPlaces(Long memberId, Double longitude, Double latitude) {
+
+        List<Place> place = placeRepository.findAll();
+
+        List<PlaceDto> places = place.stream().map(p -> {
+            boolean isBookmarked = bookmarkRepository.existsByMember_MemberIdAndPlace_PlaceId(memberId, p.getPlaceId());
+            // 거리 계산
+            double distanceKm = haversineKm(latitude, longitude, p.getLocationX(), p.getLocationY());
+            double distanceRounded = Math.round(distanceKm * 10.0) / 10.0; // 소수 1자리
+            String imageUrl = (p.getImage() != null) ? p.getImage().getImageUrl() : null;
+
+            return PlaceDto.builder()
+                    .placeId(p.getPlaceId())
+                    .placeName(p.getPlaceName())
+                    .address(p.getAddress())
+                    .distance(distanceRounded)
+                    .openingHours(resolveOpeningHours(p.getOpeningHours()))
+                    .telNum(p.getTelNum())
+                    .categoryId(p.getCategory().getCategoryId())
+                    .latitude(p.getLocationX())
+                    .longitude(p.getLocationY())
+                    .imageUrl(imageUrl)
+                    .isBookMarked(isBookmarked)
+                    .build();
+        }).toList();
+        return PlaceListDto.builder()
+                .count((long) places.size())
+                .places(places)
+                .build();
     }
 
     private double haversineKm(double lat1, double lon1, double lat2, double lon2) {
