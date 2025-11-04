@@ -7,6 +7,7 @@ import com.ucamp.greenmap.point.enums.Type;
 import com.ucamp.greenmap.point.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,53 +18,47 @@ public class PointController {
     private final PointService pointService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UsePointResponse>> usePoint(@RequestBody UsePointRequest request) {
-        Long point = pointService.usePoint(request, 1L); // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<UsePointResponse>> usePoint(@AuthenticationPrincipal Long memberId, @RequestBody UsePointRequest request) {
+        Long point = pointService.usePoint(request, memberId);
         UsePointResponse response = UsePointResponse.builder()
-                .memberId(1L) // 임시로 1L로 설정 -> 추후 수정 예정
+                .memberId(memberId)
                 .point(point)
                 .build();
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
     @GetMapping("/info")
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getPointInfo() {
-        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getPointInfo(@AuthenticationPrincipal Long memberId) {
         UserInfoResponse response = pointService.getPointInfo(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
     @GetMapping("/shop")
-    public ResponseEntity<ApiResponse<ShopInfoDto>> getShopInfo() {
-        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<ShopInfoDto>> getShopInfo(@AuthenticationPrincipal Long memberId) {
         ShopInfoDto response = pointService.getShopInfo(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
     @GetMapping("/used")
-    public ResponseEntity<ApiResponse<UsedPointLogResponse>> getUsedPointLogs() {
-        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<UsedPointLogResponse>> getUsedPointLogs(@AuthenticationPrincipal Long memberId) {
         UsedPointLogResponse response = pointService.getUsedPointLogs(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
     @GetMapping("/ranking")
-    public ResponseEntity<ApiResponse<RankingResponse>> getRanking(){
-        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<RankingResponse>> getRanking(@AuthenticationPrincipal Long memberId){
         RankingResponse response = pointService.getRanking(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<UserPointInfo>> getUserPointInfo(@RequestParam Type type) {
-        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<UserPointInfo>> getUserPointInfo(@AuthenticationPrincipal Long memberId, @RequestParam Type type) {
         UserPointInfo response = pointService.getUserPointInfo(memberId, type);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
     @GetMapping("/carbon")
-    public ResponseEntity<ApiResponse<CarbonInfoResponse>> getCarbonInfo() {
-        Long memberId = 1L; // 임시로 1L로 설정 -> 추후 수정 예정
+    public ResponseEntity<ApiResponse<CarbonInfoResponse>> getCarbonInfo(@AuthenticationPrincipal Long memberId) {
         CarbonInfoResponse response = pointService.getCarbonInfo(memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }

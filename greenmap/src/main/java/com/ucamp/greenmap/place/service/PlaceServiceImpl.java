@@ -6,6 +6,7 @@ import com.ucamp.greenmap.place.domain.Place;
 import com.ucamp.greenmap.place.dto.response.PlaceDetailResponse;
 import com.ucamp.greenmap.place.dto.response.PlaceDto;
 import com.ucamp.greenmap.place.dto.response.PlaceListDto;
+import com.ucamp.greenmap.place.dto.response.PlaceSearchDto;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -82,6 +83,15 @@ public class PlaceServiceImpl implements PlaceService {
         return PlaceListDto.builder()
                 .count((long) places.size())
                 .places(places)
+                .build();
+    }
+
+    @Override
+    public PlaceSearchDto searchPlaces(String search) {
+        List<Place> places = placeRepository.findByPlaceNameContainingOrAddressContaining(search, search);
+
+        return PlaceSearchDto.builder()
+                .placeIds(places.stream().map(Place::getPlaceId).toList())
                 .build();
     }
 

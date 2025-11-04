@@ -3,6 +3,7 @@ package com.ucamp.greenmap.place.controller;
 import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.place.dto.response.PlaceDetailResponse;
 import com.ucamp.greenmap.place.dto.response.PlaceListDto;
+import com.ucamp.greenmap.place.dto.response.PlaceSearchDto;
 import com.ucamp.greenmap.place.service.BikeService;
 import com.ucamp.greenmap.place.service.KepcoEvIngestService;
 import com.ucamp.greenmap.place.service.PlaceService;
@@ -55,6 +56,12 @@ public class PlaceController {
             @RequestParam(name = "latitude") Double latitude
     ) {
         PlaceListDto response = placeService.getAllPlaces(memberId, longitude, latitude);
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<PlaceSearchDto>> searchPlaces(@RequestParam String search) {
+        PlaceSearchDto response = placeService.searchPlaces(search);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 }
