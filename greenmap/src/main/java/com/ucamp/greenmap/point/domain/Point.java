@@ -61,4 +61,9 @@ public class Point extends BaseEntity {
         this.usedPoint += usedPoint;
         this.point -= usedPoint;
     }
+    public void addPointChallenge(Long getPoint) {
+        this.point += getPoint;
+        this.monthPoint += getPoint;
+        this.wholePoint += getPoint;
+    }
 }

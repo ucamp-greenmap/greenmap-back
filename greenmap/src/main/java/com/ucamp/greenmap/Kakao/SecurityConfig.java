@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/",
                                 "/map/**",
                                 "/place/**",
+                                "/place",
                                 "/news/**",
                                 "/member/findPw",
                                 "/member/signup",

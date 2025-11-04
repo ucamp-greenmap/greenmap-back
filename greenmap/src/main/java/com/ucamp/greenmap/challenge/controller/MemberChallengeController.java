@@ -72,7 +72,7 @@ public class MemberChallengeController {
         ProgressResponse response = memberChallengeServcie.progressChallenge(
                 memberId,
                 request.getMemberChallengeId(),
-                request.getProgress()
+                request.getTimes()
         );
 
         return ResponseEntity.ok(ApiResponse.success("진행률 수정완료", response));

@@ -1,17 +1,29 @@
 package com.ucamp.greenmap.challenge.service;
 
+import com.ucamp.greenmap.badge.domain.Badge;
+import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.BadgeRepository;
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.challenge.domain.Challenge;
 import com.ucamp.greenmap.challenge.domain.MemberChallenge;
 import com.ucamp.greenmap.challenge.dto.response.*;
 import com.ucamp.greenmap.challenge.repository.ChallengeRepository;
 import com.ucamp.greenmap.challenge.repository.MemberChallengeRepository;
+import com.ucamp.greenmap.common.domain.Category;
+import com.ucamp.greenmap.common.domain.CategoryName;
+import com.ucamp.greenmap.common.repository.CategoryRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.member.repository.MemberRepository;
+import com.ucamp.greenmap.point.domain.Point;
+import com.ucamp.greenmap.point.domain.PointHistory;
+import com.ucamp.greenmap.point.repository.PointHistoryRepository;
+import com.ucamp.greenmap.point.repository.PointRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +34,11 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
     private final MemberChallengeRepository memberChallengeRepository;
     private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
+    private final PointRepository pointRepository;
+    private final PointHistoryRepository pointHistoryRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
+    private final BadgeRepository badgeRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public MemberChallengeregis registMemberChallenge(Long memberId, Long challengeId){
@@ -186,13 +203,69 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
     }
 
     @Override
-    public ProgressResponse progressChallenge(Long memberId, Long memberChallengeId, Long progress) {
+    @Transactional
+    public ProgressResponse progressChallenge(Long memberId, Long memberChallengeId, Long times) {
 
         MemberChallenge memberChallenge = memberChallengeRepository
                 .findChallengeByMember(memberId, memberChallengeId)
                 .orElseThrow(() -> new RuntimeException("해당 챌린지가 존재하지 않거나 회원 소유가 아닙니다."));
 
+        //  챌린지 목표 횟수 가져오기
+        Long goal = memberChallenge.getChallenge().getSuccess();
+
+        if (goal == null || goal <= 0) {
+            throw new RuntimeException("챌린지 목표가 설정되지 않았습니다.");
+        }
+
+        //  success 기반으로 진행률(%) 계산
+        Long progress = (long) Math.min(100,
+                Math.ceil((double) times / goal * 100));
+
+        //  progress 업데이트
         memberChallenge.updateProgress(progress);
+
+        //  100% & 아직 활성 상태이면 포인트 지급
+        if (progress >= 100 && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
+
+            Member member = memberChallenge.getMember();
+            Challenge challenge = memberChallenge.getChallenge();
+            Long rewardPoint = challenge.getPointAmount();
+
+            //  포인트 조회 & 업데이트
+            Point point = pointRepository.findByMember_MemberId(memberId)
+                    .orElseThrow(() -> new RuntimeException("포인트 정보가 없습니다."));
+            point.addPointChallenge(rewardPoint);
+
+            Category category = categoryRepository.findByCategoryName(CategoryName.CHALLENGE)
+                    .orElseThrow();
+
+            //  PointHistory 기록
+            PointHistory pointHistory = PointHistory.builder()
+                    .member(member)
+                    .category(category)
+                    .pointAmount(rewardPoint)
+                    .description(challenge.getDescription())
+                    .logId(memberChallengeId)
+                    .build();
+            pointHistory.setCreatedAt(LocalDateTime.now());
+            pointHistoryRepository.save(pointHistory);
+
+            //  뱃지 업데이트
+            MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId)
+                    .orElseThrow();
+            Badge nextBadge = badgeRepository.findById(
+                    memberBadge.getBadge().getBadgeId() != 5 ?
+                            memberBadge.getBadge().getBadgeId() + 1 : 5
+            ).orElseThrow();
+
+            if (point.getWholePoint() >= nextBadge.getRequirement()
+                    && memberBadge.getBadge().getBadgeId() != 5) {
+                memberBadge.updateBadge(nextBadge);
+            }
+
+            //  챌린지 완료 처리
+            memberChallenge.completeChallenge();
+        }
 
         MemberChallenge updated = memberChallengeRepository.save(memberChallenge);
 
@@ -204,6 +277,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .isActive(updated.getIsActive())
                 .build();
     }
+
 
 
 

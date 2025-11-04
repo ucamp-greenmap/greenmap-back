@@ -33,13 +33,12 @@ public class MemberChallenge extends BaseEntity {
 
     public void updateProgress(Long progress) {
         this.progress = progress;
-
-        if (progress >= 100) {
-            this.isActive = Boolean.FALSE;  // 완료
-        } else {
-            this.isActive = Boolean.TRUE;   // 진행중
-        }
     }
+
+    public void completeChallenge() {
+        this.isActive = false;
+    }
+
 
 
 
