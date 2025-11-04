@@ -3,11 +3,14 @@ package com.ucamp.greenmap.member.service;
 import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.dto.response.MyPageResponse;
 import com.ucamp.greenmap.member.dto.response.RecodeResponse;
+import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.dto.request.MostActiveCategory;
 import com.ucamp.greenmap.point.dto.response.RankingResponse;
 import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
+import com.ucamp.greenmap.point.repository.PointRepository;
 import com.ucamp.greenmap.point.service.PointService;
+import com.ucamp.greenmap.verification.dto.response.CategoryCount;
 import com.ucamp.greenmap.verification.repository.HistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,8 @@ public class MyPageServiceImpl implements MyPageService {
 
     private final MemberService memberService;
     private final HistoryRepository historyRepository;
+    private final PointRepository pointRepository;
+    private final PointHistoryRepository pointHistoryRepository;
     private final PointService pointService;
 
     @Override
@@ -49,25 +54,41 @@ public class MyPageServiceImpl implements MyPageService {
                 )
                 .build();
     }
-
     @Override
     public RecodeResponse getRecode(Long memberId) {
+        // 회원 정보
         MemberResponse member = memberService.getMyInfo(memberId);
 
-        Integer curVerify = historyRepository.countThisMonth(memberId);
-        Integer prevVerify = historyRepository.countLastMonth(memberId);
+        // 현재 포인트(누적)
+        Point point = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("포인트 정보가 없습니다."));
 
-        var top = historyRepository.mostActiveCategoryThisMonth(memberId);
+        Long curVerify = historyRepository.countThisMonth(memberId);
+        Long prevVerify = historyRepository.countLastMonth(memberId);
+
+        // 가장 많이 한 카테고리 + 횟수
+        CategoryCount top = historyRepository.mostActiveCategoryThisMonth(memberId);
+        String category = top != null ? top.getCategoryName() : null;
+        Long count = top != null ? top.getCnt() : 0L;
+
+        // 포인트 합산 (PointHistory 기반)
+        Long prevPoint = pointHistoryRepository.sumLastMonthPoints(memberId);
+        Long curPoint = pointHistoryRepository.sumThisMonthPoints(memberId);
+
+        Long pointDiff = (curPoint != null ? curPoint : 0) -
+                (prevPoint != null ? prevPoint : 0);
 
         return RecodeResponse.builder()
                 .memberId(member.getMemberId())
                 .verifyTimes(curVerify != null ? curVerify : 0)
                 .timesDiff((curVerify != null ? curVerify : 0) -
                         (prevVerify != null ? prevVerify : 0))
-                .mostKind(top != null && !top.isEmpty() ? top.get(0).getCategoryName() : null)
-                .mostTimes(top != null && !top.isEmpty() ? top.get(0).getCount() : 0)
-                .pointSum(0) // 너 포인트 sum 로직 넣을거면 여기
-                .pointDiff(0) // 포인트 diff도 로직 있으면 넣기
+                .mostKind(category)
+                .mostTimes(count)
+                .pointSum(point.getWholePoint())       // 누적포인트
+                .pointDiff(pointDiff)                 // 포인트 차이
                 .build();
     }
+
+
 }
