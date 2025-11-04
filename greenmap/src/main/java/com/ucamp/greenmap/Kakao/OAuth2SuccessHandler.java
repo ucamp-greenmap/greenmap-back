@@ -4,10 +4,13 @@ import com.ucamp.greenmap.Kakao.repository.UserRepository;
 import com.ucamp.greenmap.image.domain.Image;
 import com.ucamp.greenmap.image.repository.ImageRepository;
 import com.ucamp.greenmap.member.domain.Member;
+import com.ucamp.greenmap.point.domain.Point;
+import com.ucamp.greenmap.point.repository.PointRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -25,12 +28,16 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
+    private final PointRepository pointRepository;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Transactional
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
 
         System.out.println("OAuth2 Success Handler 실행됨");
 
@@ -63,7 +70,19 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             user.setPassword("SOCIAL_LOGIN");
             user.setImage(img);
 
-            userRepository.save(user);
+            Member saved = userRepository.save(user);
+            Point point = Point.builder()
+                    .member(saved)
+                    .point(0L)
+                    .monthPoint(0L)
+                    .usedPoint(0L)
+                    .wholePoint(0L)
+                    .carbonSaveTotal(0L)
+                    .pointTimes(0L)
+                    .wholePointTimes(0L)
+                    .build();
+
+            pointRepository.save(point);
         } else {
             Image img = user.getImage();
             if (img != null) {
@@ -83,8 +102,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // Frontend redirect
         if (!response.isCommitted()) {
-            response.sendRedirect("https://greenmap-ucamp.netlify.app/login/success?token=" + accessToken);
-            //response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
+            response.sendRedirect(frontendUrl + "/login/success?token=" + accessToken);
         }
     }
 }
