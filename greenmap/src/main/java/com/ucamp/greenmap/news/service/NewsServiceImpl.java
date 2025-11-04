@@ -6,7 +6,6 @@ import com.ucamp.greenmap.badge.repository.BadgeRepository;
 import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
-import com.ucamp.greenmap.common.dto.ApiResponse;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.news.domain.NewsViewLog;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -49,6 +47,9 @@ public class NewsServiceImpl implements NewsService {
 
     @Value("${naver.api.client-secret}")
     private String clientSecret;
+
+    // 한 번에 몇 개의 뉴스를 가져올지 설정
+    private int howManyNews = 6;
 
     @Autowired
     public NewsServiceImpl(@Qualifier("naverWebClient") WebClient webClient,
@@ -78,14 +79,43 @@ public class NewsServiceImpl implements NewsService {
      * @return 뉴스 검색 결과
      */
     @Override
-    public NewsResponse searchNews() {
-
+    public NewsResponse searchNews(Long memberId) {
         // WebClient를 사용하여 네이버 뉴스 검색 API 호출
-        NewsResponse newsResponse = webClient.get()
+        NewsResponse newsResponse = fetch();
+
+        // API 응답 검증
+        if (newsResponse == null) {
+            throw new RuntimeException("뉴스 검색 API 응답이 null입니다.");
+        }
+
+        // 받아온 뉴스들 중 4개만 남기기
+        List<NewsResponse.NewsItem> newsList = newsResponse.getItems();
+        while (newsList.size() > 4) {
+            newsList.removeLast();
+        }
+
+        // 로그인하지 않은 사용자일 경우 isRead 체크 없이 응답 반환
+        if (memberId == null) {
+            return newsResponse;
+        }
+
+        // 이미 읽은 뉴스인지 확인 및 isRead 설정
+        for (NewsResponse.NewsItem item : newsList) {
+            if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), memberId)) {
+                item.setRead(true);
+            }
+        }
+
+        // 성공 응답 반환
+        return newsResponse;
+    }
+
+    private NewsResponse fetch() {
+        return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
                         .queryParam("query", "환경")
-                        .queryParam("display", 6)
+                        .queryParam("display", howManyNews)
                         .build())
                 .header("X-Naver-Client-Id", clientId)
                 .header("X-Naver-Client-Secret", clientSecret)
@@ -101,69 +131,49 @@ public class NewsServiceImpl implements NewsService {
                 .bodyToMono(NewsResponse.class)
                 .timeout(Duration.ofSeconds(10))
                 .block();
-
-        // API 응답 검증
-        if (newsResponse == null) {
-            throw new RuntimeException("뉴스 검색 API 응답이 null입니다.");
-        }
-
-        // 받아온 뉴스들 중 4개만 남기기
-        List<NewsResponse.NewsItem> newsList = newsResponse.getItems();
-        while (newsList.size() > 4) {
-            newsList.removeLast();
-        }
-
-        // 이미 읽은 뉴스인지 확인 및 isRead 설정
-        for (NewsResponse.NewsItem item : newsList) {
-            if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), 1L)) {
-                item.setRead(true);
-            }
-        }
-
-        // 성공 응답 반환
-        return newsResponse;
-
     }
 
     @Override
-    public String viewNews(NewsRequest request) {
-
+    public String viewNews(Long memberId, NewsRequest request) {
         // 필요한 엔티티 생성 및 조회
-        Member member = Member.builder()
-                .memberId(request.getMemberId())
-                .build();
-        Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow();
+        Member memberRef = Member.builder().memberId(memberId).build();
+        Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow(
+                () -> new IllegalStateException("NEWS 카테고리가 DB에 없습니다."));
 
         // 뉴스 뷰 로그 저장
         NewsViewLog log = NewsViewLog.builder()
-                .member(member)
+                .member(memberRef)
                 .newsTitle(request.getTitle())
                 .build();
-        log.setCreatedAt(LocalDateTime.now());
+        log.setCreatedAt();
         newsRepository.save(log);
 
         // 포인트 히스토리 저장
-        NewsViewLog newsViewLog = newsRepository.findByNewsTitleAndMember_MemberId(request.getTitle(), member.getMemberId());
+        NewsViewLog newsViewLog = newsRepository.findByNewsTitleAndMember_MemberId(
+                request.getTitle(),
+                memberRef.getMemberId()
+        ).orElseThrow(() -> new IllegalStateException("뉴스 뷰 로그가 존재하지 않습니다."));
         PointHistory pointHistory = PointHistory.builder()
-                .member(member)
+                .member(memberRef)
                 .category(category)
                 .pointAmount(5L)
-                .description("description")
+                .description("사용자가 뉴스를 조회했습니다.")
                 .logId(newsViewLog.getLogId())
                 .build();
-        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistory.setCreatedAt();
         pointHistoryRepository.save(pointHistory);
 
         // 포인트 적립
-        Point point = pointRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
+        Point point = pointRepository.findByMember_MemberId(memberRef.getMemberId()).orElseThrow(() -> new IllegalStateException("포인트 정보가 존재하지 않습니다."));
         point.addPoint(5L);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(member.getMemberId()).orElseThrow();
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberRef.getMemberId()).orElseThrow(
+                () -> new IllegalStateException("멤버 뱃지 정보가 존재하지 않습니다."));
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
                         memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow();
+        ).orElseThrow(() -> new IllegalStateException("다음 뱃지 정보가 존재하지 않습니다."));
         if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
             memberBadge.updateBadge(nextBadge);
         }
