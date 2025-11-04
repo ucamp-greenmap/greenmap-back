@@ -25,12 +25,13 @@ public class PlaceController {
 
     @GetMapping("/{placeId}")
     public ResponseEntity<ApiResponse<PlaceDetailResponse>> getPlaceDetails(
+            @AuthenticationPrincipal Long memberId,
             @PathVariable("placeId") Long placeId,
             @RequestParam(name = "longitude", required = false) Double longitude,
             @RequestParam(name = "latitude",  required = false) Double latitude
     ) {
         // 유저가 있으면 넘기고 없으면 null로 넘기기
-        PlaceDetailResponse response = placeService.getPlaceDetail(1L, placeId, longitude, latitude);
+        PlaceDetailResponse response = placeService.getPlaceDetail(memberId, placeId, longitude, latitude);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 
