@@ -42,19 +42,11 @@ public class BikeServiceImpl implements BikeService {
 
     @Override
     public String saveBikeStations() {
-        log.info("여기까진 왔겠지 설마");
-        // 따릉이 대여소 정보는 총 3200개, 1000개 단위로 나누어 fetch
-        BikeResponse response1 = fetch(1, 10);
-//        BikeResponse response1 = fetch(1, 1000);
-//        log.info("fetch 1개");
-//        BikeResponse response2 = fetch(1001, 2000);
-//        log.info("fetch 1개");
-//        BikeResponse response3 = fetch(2001, 3000);
-//        log.info("fetch 1개");
-//        BikeResponse response4 = fetch(3001, 4000);
-//        log.info("fetch 1개");
-//        List<BikeResponse> responses = List.of(response1, response2, response3, response4);
-        List<BikeResponse> responses = List.of(response1);
+        BikeResponse response1 = fetch(1, 1000);
+        BikeResponse response2 = fetch(1001, 2000);
+        BikeResponse response3 = fetch(2001, 3000);
+        BikeResponse response4 = fetch(3001, 4000);
+        List<BikeResponse> responses = List.of(response1, response2, response3, response4);
 
         log.info("따릉이 대여소 정보 fetch 완료");
 
@@ -70,7 +62,8 @@ public class BikeServiceImpl implements BikeService {
         log.info("중복 제거 완료");
 
         // DB에 저장
-        Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(() -> new IllegalStateException("BIKE 카테고리가 DB에 없습니다."));
+        Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(
+                () -> new IllegalStateException("BIKE 카테고리가 DB에 없습니다."));
         for (BikeResponse.BaseInfo.BikeStation bs : bikeStationMap.values()) {
             String name = bs.getStationName();
             String address = bs.getAddress();
@@ -106,7 +99,7 @@ public class BikeServiceImpl implements BikeService {
                         .build(apikey, start, end))
                 .retrieve()
                 .bodyToMono(BikeResponse.class)
-//                .timeout(Duration.ofSeconds(20))
+                .timeout(Duration.ofSeconds(10))
                 .block();
         LocalDateTime endTime = LocalDateTime.now();
         log.info("따릉이 대여소 정보 fetch 완료 (start: {}, end: {}, 소요시간: {}초)", start, end, Duration.between(startTime, endTime).toSeconds());
