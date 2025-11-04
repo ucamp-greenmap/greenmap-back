@@ -21,25 +21,25 @@ public interface PointHistoryRepository extends JpaRepository<PointHistory, Long
     //---------------------------------마이페이지-------------------------------------------
 
     @Query(value = """
-    SELECT COALESCE(SUM(point_amount),0)
-    FROM point_history
-    WHERE member_id = :memberId
-    AND point_amount > 0
-    AND MONTH(created_at) = MONTH(CURRENT_DATE())
-    AND YEAR(created_at) = YEAR(CURRENT_DATE())
+    SELECT COALESCE(SUM(p.point_amount), 0)
+    FROM point_history p
+    WHERE p.member_id = :memberId
+      AND DATE_FORMAT(p.created_at, '%Y-%m') = DATE_FORMAT(CURRENT_DATE, '%Y-%m')
 """, nativeQuery = true)
-    Integer sumThisMonth(@Param("memberId") Long memberId);
+    Long sumThisMonthPoints(@Param("memberId") Long memberId);
+
 
 
     @Query(value = """
-    SELECT COALESCE(SUM(point_amount),0)
-    FROM point_history
-    WHERE member_id = :memberId
-    AND point_amount > 0
-    AND MONTH(created_at) = MONTH(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
-    AND YEAR(created_at) = YEAR(DATE_SUB(CURRENT_DATE(), INTERVAL 1 MONTH))
+    SELECT COALESCE(SUM(p.point_amount), 0)
+    FROM point_history p
+    WHERE p.member_id = :memberId
+      AND DATE_FORMAT(p.created_at, '%Y-%m') = DATE_FORMAT(CURRENT_DATE - INTERVAL 1 MONTH, '%Y-%m')
 """, nativeQuery = true)
-    Integer sumLastMonth(@Param("memberId") Long memberId);
+    Long sumLastMonthPoints(@Param("memberId") Long memberId);
+
+
+
 
 
 }
