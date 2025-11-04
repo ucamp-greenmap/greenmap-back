@@ -33,7 +33,7 @@ public class SecurityConfig {
 
                             .sessionManagement(session -> session.sessionFixation().newSession())
 
-                                .authorizeHttpRequests(auth -> auth
+                            .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(
                                                                 "/",
                                                                 "/map/**",
