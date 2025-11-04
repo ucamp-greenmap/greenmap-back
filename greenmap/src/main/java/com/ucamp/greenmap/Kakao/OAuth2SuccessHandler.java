@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -26,11 +27,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Transactional
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        Authentication authentication) throws IOException {
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
 
         System.out.println("OAuth2 Success Handler 실행됨");
 
@@ -83,8 +87,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // Frontend redirect
         if (!response.isCommitted()) {
-            response.sendRedirect("https://greenmap-ucamp.netlify.app/login/success?token=" + accessToken);
-            //response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
+            response.sendRedirect(frontendUrl + "/login/success?token=" + accessToken);
         }
     }
 }
