@@ -31,5 +31,18 @@ public class MemberChallenge extends BaseEntity {
     @Column(name = "progress", nullable = false)
     private Long progress;
 
+    public void updateProgress(Long progress) {
+        this.progress = progress;
+    }
+
+    public void completeChallenge() {
+        this.isActive = false;
+    }
+
+
+
+
+
+
 
 }
