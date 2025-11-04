@@ -33,24 +33,26 @@ public class SecurityConfig {
 
                             .sessionManagement(session -> session.sessionFixation().newSession())
 
-                            .authorizeHttpRequests(auth -> auth
-                                            .requestMatchers(
-                                                            "/",
-                                                            "/map/**",
-                                                            "/place/**",
-                                                            "/place",
-                                                            "/news/**",
-                                                            "/member",
-                                                            "/member/findPw",
-                                                            "/member/signup",
-                                                            "/login/success",
-                                                            "/error",
-                                                            "/favicon.ico",
-                                                            "/oauth2/**",
-                                                            "/login/**",
-                                                            "/login/oauth2/**")
-                                            .permitAll()
-                                            .anyRequest().authenticated())
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/",
+                                                                "/map/**",
+                                                                "/place/**",
+                                                                "/place",
+                                                                "/news/**",
+                                                                "/member",
+                                                                "/member/me",
+                                                                "/member/login",
+                                                                "/member/findPw",
+                                                                "/member/signup",
+                                                                "/login/success",
+                                                                "/error",
+                                                                "/favicon.ico",
+                                                                "/oauth2/**",
+                                                                "/login/**",
+                                                                "/login/oauth2/**")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
 
                             .oauth2Login(oauth -> oauth
                                             .authorizationEndpoint(

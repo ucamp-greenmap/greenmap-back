@@ -18,7 +18,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -88,7 +87,7 @@ public class PointServiceImpl implements PointService {
                 .description(description)
                 .logId(logId)              // CASH면 null
                 .build();
-        history.setCreatedAt(LocalDateTime.now());
+        history.setCreatedAt();
 
         pointHistoryRepository.save(history);
 
@@ -178,9 +177,9 @@ public class PointServiceImpl implements PointService {
 
         List<PointHistory> histories = switch (type) {
             case Used -> pointHistoryRepository
-                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(6L, 7L));
+                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(7L, 8L));
             case Get -> pointHistoryRepository
-                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(1L, 2L, 3L, 4L, 5L, 8L));
+                    .findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(memberId, List.of(1L, 2L, 3L, 4L, 5L, 6L, 9L));
             case All -> pointHistoryRepository
                     .findByMember_MemberIdOrderByCreatedAtDesc(memberId);
         };
@@ -189,8 +188,8 @@ public class PointServiceImpl implements PointService {
                 .map(history -> {
                     String categoryName = switch (history.getCategory().getCategoryId().intValue()) {
                         case 9 -> "챌린지";
-                        case 5 -> "뉴스";
-                        case 6, 7 -> "교환";
+                        case 6 -> "뉴스";
+                        case 7, 8 -> "교환";
                         default -> "인증";
                     };
 
@@ -245,8 +244,8 @@ public class PointServiceImpl implements PointService {
             switch (catId != null ? catId.intValue() : -1) {
                 case 1 -> bike += saved; // 따릉이
                 case 2 -> zero += saved; // 제로웨이스트
-                case 3 -> car += saved; // EV/수소차
-                case 4 -> recycle += saved; // 재활용센터
+                case 3, 4 -> car += saved; // 전기차/수소차
+                case 5 -> recycle += saved; // 재활용센터
                 default -> { /* 무시 */ }
             }
         }
