@@ -27,8 +27,21 @@ FROM eclipse-temurin:21-jre-alpine
 # 작업 디렉토리 설정
 WORKDIR /app
 
+# Cloud SQL Proxy 설치
+RUN apk add --no-cache curl && \
+    curl -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.11.4/cloud-sql-proxy.linux.amd64 && \
+    chmod +x cloud-sql-proxy && \
+    mv cloud-sql-proxy /usr/local/bin/
+
 # 빌드 스테이지에서 생성된 JAR 파일 복사
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar ./
+
+# 시작 스크립트 생성
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'cloud-sql-proxy --port 3306 ${INSTANCE_CONNECTION_NAME} &' >> /app/start.sh && \
+    echo 'sleep 5' >> /app/start.sh && \
+    echo 'exec java $JAVA_OPTS -jar *.jar' >> /app/start.sh && \
+    chmod +x /app/start.sh
 
 # 애플리케이션 포트 노출 (Spring Boot 기본 포트)
 EXPOSE 8080
@@ -40,4 +53,4 @@ ENV SPRING_PROFILES_ACTIVE=prod
 ENV JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseContainerSupport"
 
 # 애플리케이션 실행
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+ENTRYPOINT ["/app/start.sh"]
