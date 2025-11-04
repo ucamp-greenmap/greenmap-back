@@ -29,7 +29,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,18 +60,19 @@ public class VerificationServiceImpl implements VerificationService{
         Validate validate = Validate.builder()
                 .certInfo(certInfo)
                 .build();
-        validate.setCreatedAt(LocalDateTime.now());
+        validate.setCreatedAt();
         validateRepository.save(validate);
 
         // 필요한 엔티티 조회
-        Place place = placeRepository.findById(1L).orElseThrow();
-        Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow();
+        Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(
+                () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+        Place place = placeRepository.findById(1L).orElseThrow(() -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
                 .build();
 
         // Point, carbonSave 계산
-        long carbonSave = (long) (Math.ceil((double) bikeRequest.getDistance() / 5));
+        Long carbonSave = (long) (Math.ceil((double) bikeRequest.getDistance() / 5));
         Long pointAmount = (long) ((double) bikeRequest.getDistance() / 0.1);
 
         // 인증 내역 생성 및 저장
@@ -83,7 +83,7 @@ public class VerificationServiceImpl implements VerificationService{
                 .distance(bikeRequest.getDistance())
                 .carbonSave(carbonSave)
                 .build();
-        history.setCreatedAt(LocalDateTime.now());
+        history.setCreatedAt();
         historyRepository.save(history);
 
         // PointHistory 생성 및 저장
@@ -91,19 +91,20 @@ public class VerificationServiceImpl implements VerificationService{
                 .member(member)
                 .category(category)
                 .pointAmount(pointAmount)
-                .description("자전거 이용 인증")
+                .description("따릉이 이용 인증")
                 .logId(history.getHistoryId())
                 .build();
-        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistory.setCreatedAt();
         pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
-        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(() -> new IllegalArgumentException("포인트 정보를 찾을 수 없습니다."));
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("멤버 뱃지 정보를 찾을 수 없습니다."));
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
                         memberBadge.getBadge().getBadgeId() + 1 : 5
@@ -133,19 +134,20 @@ public class VerificationServiceImpl implements VerificationService{
         Validate validate = Validate.builder()
                 .certInfo(certInfo)
                 .build();
-        validate.setCreatedAt(LocalDateTime.now());
+        validate.setCreatedAt();
         validateRepository.save(validate);
 
         // 필요한 엔티티 조회
-        Category category = categoryRepository.findByCategoryName(CategoryName.CAR).orElseThrow();
-        Place place = placeRepository.findById(3L).orElseThrow();
+        Category category = categoryRepository.findByCategoryName(CategoryName.CAR).orElseThrow(
+                () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+        Place place = placeRepository.findById(3L).orElseThrow(() -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
                 .build();
 
         // Point, carbonSave 계산
-        long pointAmount = (long) ((double) carRequest.getChargeFee() / 100);
-        long carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
+        Long pointAmount = (long) ((double) carRequest.getChargeFee() / 100);
+        Long carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
 
         // History 생성 및 저장
         History history = History.builder()
@@ -156,7 +158,7 @@ public class VerificationServiceImpl implements VerificationService{
                 .purchaseAmount(carRequest.getChargeFee())
                 .carbonSave(carbonSave)
                 .build();
-        history.setCreatedAt(LocalDateTime.now());
+        history.setCreatedAt();
         historyRepository.save(history);
 
         // PointHistory 생성 및 저장
@@ -167,16 +169,17 @@ public class VerificationServiceImpl implements VerificationService{
                 .description("전기차/수소차 총전소 이용 인증")
                 .logId(history.getHistoryId())
                 .build();
-        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistory.setCreatedAt();
         pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트
-        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow();
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(() -> new IllegalArgumentException("포인트 정보를 찾을 수 없습니다."));
         point.addPoint(pointAmount);
         point.addCarbonSaveTotal(carbonSave);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow();
+        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("멤버 뱃지 정보를 찾을 수 없습니다."));
         Badge nextBadge = badgeRepository.findById(
                 memberBadge.getBadge().getBadgeId() != 5 ?
                         memberBadge.getBadge().getBadgeId() + 1 : 5
@@ -206,28 +209,35 @@ public class VerificationServiceImpl implements VerificationService{
         Validate validate = Validate.builder()
                 .certInfo(certInfo)
                 .build();
-        validate.setCreatedAt(LocalDateTime.now());
+        validate.setCreatedAt();
         validateRepository.save(validate);
 
         // 필요한 엔티티 조회
-        Place place = null;
-        Category category = null;
+        CategoryName categoryName = null;
+        Long placeId = null;
+        String description = null;
         if (shopRequest.getCategory().equals("recycle")) {
-            category = categoryRepository.findByCategoryName(CategoryName.RECYCLING_CENTER).orElseThrow();
-            place = placeRepository.findById(4L).orElseThrow();
+            categoryName = CategoryName.RECYCLING_CENTER;
+            placeId = 4L;
+            description = "재활용센터 이용 인증";
         } else if (shopRequest.getCategory().equals("zero")) {
-            category = categoryRepository.findByCategoryName(CategoryName.ZERO_WASTE).orElseThrow();
-            place = placeRepository.findById(2L).orElseThrow();
+            categoryName = CategoryName.ZERO_WASTE;
+            placeId = 2L;
+            description = "제로웨이스트 가게 이용 인증";
         } else {
             throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
         }
+        Category category = categoryRepository.findByCategoryName(categoryName).orElseThrow(
+                () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
+        Place place = placeRepository.findById(placeId).orElseThrow(
+                () -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
                 .build();
 
         // Point, carbonSave 계산
-        long pointAmount = (long) ((double) shopRequest.getPrice() / 100);
-        long carbonSave = (long) (Math.ceil((double) shopRequest.getPrice() / 20000));
+        Long pointAmount = (long) ((double) shopRequest.getPrice() / 100);
+        Long carbonSave = (long) (Math.ceil((double) shopRequest.getPrice() / 20000));
 
         // History 생성 및 저장
         History history = History.builder()
@@ -237,7 +247,7 @@ public class VerificationServiceImpl implements VerificationService{
                 .purchaseAmount(shopRequest.getPrice())
                 .carbonSave(carbonSave)
                 .build();
-        history.setCreatedAt(LocalDateTime.now());
+        history.setCreatedAt();
         historyRepository.save(history);
 
         // PointHistory 생성 및 저장
@@ -245,10 +255,10 @@ public class VerificationServiceImpl implements VerificationService{
                 .member(member)
                 .category(category)
                 .pointAmount(pointAmount)
-                .description("전기차/수소차 총전소 이용 인증")
+                .description(description)
                 .logId(history.getHistoryId())
                 .build();
-        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistory.setCreatedAt();
         pointHistoryRepository.save(pointHistory);
 
         // Member의 Point, carbonSave 업데이트

@@ -9,6 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @Setter
@@ -25,4 +26,8 @@ public class BaseEntity {
 
     @Column(name = "is_active")
     protected Boolean isActive = true;
+
+    public void setCreatedAt() {
+        this.createdAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
 }
