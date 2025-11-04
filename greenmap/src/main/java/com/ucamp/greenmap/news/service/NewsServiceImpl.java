@@ -145,7 +145,7 @@ public class NewsServiceImpl implements NewsService {
                 .member(memberRef)
                 .newsTitle(request.getTitle())
                 .build();
-        log.setCreatedAt(LocalDateTime.now());
+        log.setCreatedAt();
         newsRepository.save(log);
 
         // 포인트 히스토리 저장
@@ -160,7 +160,7 @@ public class NewsServiceImpl implements NewsService {
                 .description("사용자가 뉴스를 조회했습니다.")
                 .logId(newsViewLog.getLogId())
                 .build();
-        pointHistory.setCreatedAt(LocalDateTime.now());
+        pointHistory.setCreatedAt();
         pointHistoryRepository.save(pointHistory);
 
         // 포인트 적립
