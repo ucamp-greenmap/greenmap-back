@@ -156,7 +156,13 @@ public class VerificationServiceImpl implements VerificationService{
 
         // Point, carbonSave 계산
         Long pointAmount = (long) ((double) carRequest.getChargeFee() / 100);
-        Long carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
+        Long carbonSave = null;
+        if (carRequest.getChargeAmount() == 0) {
+            carbonSave = (long) (Math.ceil((double) carRequest.getChargeFee() / 100));
+        } else {
+            carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
+        }
+
 
         // History 생성 및 저장
         History history = History.builder()
