@@ -1,6 +1,9 @@
 package com.ucamp.greenmap.Kakao;
 
 import com.ucamp.greenmap.Kakao.repository.UserRepository;
+import com.ucamp.greenmap.badge.domain.Badge;
+import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.image.domain.Image;
 import com.ucamp.greenmap.image.repository.ImageRepository;
 import com.ucamp.greenmap.member.domain.Member;
@@ -29,6 +32,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final PointRepository pointRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -83,6 +87,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             pointRepository.save(point);
+
+            MemberBadge memberBadge = MemberBadge.builder()
+                    .member(saved)
+                    .badge(Badge.builder().badgeId(1L).build())
+                    .build();
+            memberBadgeRepository.save(memberBadge);
         } else {
             Image img = user.getImage();
             if (img != null) {
