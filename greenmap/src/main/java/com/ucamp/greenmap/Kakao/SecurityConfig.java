@@ -41,6 +41,8 @@ public class SecurityConfig {
                                                                 "/place",
                                                                 "/news/**",
                                                                 "member",
+                                                                "/admin",
+                                                                "/chalregis",
                                                                 "/member/check-email",
                                                                 "/member/check-nickname",
                                                                 "/member/me",
