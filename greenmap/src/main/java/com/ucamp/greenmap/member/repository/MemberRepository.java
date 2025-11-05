@@ -2,6 +2,9 @@ package com.ucamp.greenmap.member.repository;
 
 import com.ucamp.greenmap.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member,Long> {
@@ -17,5 +20,7 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
 
     // 카카오 로그인용 (카카오 ID로 조회)
     Optional<Member> findByKakaoId(Long kakaoId);
+
+   boolean existsById(Long memberId);
 
 }
