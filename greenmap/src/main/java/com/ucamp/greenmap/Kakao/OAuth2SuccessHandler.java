@@ -102,8 +102,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         // Frontend redirect
         if (!response.isCommitted()) {
-//            response.sendRedirect(frontendUrl + "/login/success?token=" + accessToken);
-            response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
+            response.sendRedirect(frontendUrl + "/login/success?token=" + accessToken);
+            //response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
         }
     }
 }
