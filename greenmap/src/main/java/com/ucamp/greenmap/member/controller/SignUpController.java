@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -20,38 +21,36 @@ public class SignUpController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<SignUpResponse>> signUp(
-            @RequestBody SignUpRequest request){
+            @RequestParam SignUpRequest request){
 
         SignUpResponse response = signUpService.signup(request);
         return ResponseEntity.ok(ApiResponse.success("일반 회원가입 성공 ",response));
     }
 
     @GetMapping("/check-email")
-    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkEmail(@RequestBody String email) {
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkEmail(
+            @RequestParam("email") String email) {
+
         boolean exists = signUpService.existsByEmail(email);
 
-        Map<String, Boolean> result = Map.of("state", exists);
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("state", exists);
 
-        return ResponseEntity.ok(
-                ApiResponse.success(
-                        exists ? "이미 존재하는 이메일입니다." : "사용 가능한 이메일입니다.",
-                        result
-                )
-        );
+        return ResponseEntity.ok(ApiResponse.success("이메일 중복 확인 완료", result));
     }
+
 
 
     @GetMapping("/check-nickname")
-        public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNickname(@RequestBody String nickname) {
-            boolean exists = signUpService.existsByNickname(nickname);
+    public ResponseEntity<ApiResponse<Map<String, Boolean>>> checkNickname(
+            @RequestParam("nickname") String nickname) {
 
-            Map<String, Boolean> result = Map.of("state", exists);
+        boolean exists = signUpService.existsByNickname(nickname);
 
-            return ResponseEntity.ok(
-                    ApiResponse.success(
-                            exists ? "이미 존재하는 닉네임입니다." : "사용 가능한 닉네임입니다.",
-                            result
-                    )
-            );
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("state", exists);
+
+        return ResponseEntity.ok(ApiResponse.success("닉네임 중복 확인 완료", result));
     }
+
 }
