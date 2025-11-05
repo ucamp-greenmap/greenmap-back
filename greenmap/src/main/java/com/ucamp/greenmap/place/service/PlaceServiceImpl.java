@@ -30,8 +30,8 @@ public class PlaceServiceImpl implements PlaceService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 장소입니다."));
 
         // 1) 좌표 파싱 (locationX=경도, locationY=위도 라고 가정)
-        double placeLat = place.getLocationX();
-        double placeLon = place.getLocationY();
+        double placeLat = place.getLocationY();
+        double placeLon = place.getLocationX();
 
         // 2) 거리 계산 (km)
         double distanceKm = haversineKm(latitude, longitude, placeLat, placeLon);
@@ -62,7 +62,7 @@ public class PlaceServiceImpl implements PlaceService {
         List<PlaceDto> places = place.stream().map(p -> {
             boolean isBookmarked = bookmarkRepository.existsByMember_MemberIdAndPlace_PlaceId(memberId, p.getPlaceId());
             // 거리 계산
-            double distanceKm = haversineKm(latitude, longitude, p.getLocationX(), p.getLocationY());
+            double distanceKm = haversineKm(latitude, longitude, p.getLocationY(), p.getLocationX());
             double distanceRounded = Math.round(distanceKm * 10.0) / 10.0; // 소수 1자리
             String imageUrl = (p.getImage() != null) ? p.getImage().getImageUrl() : null;
 
@@ -74,8 +74,8 @@ public class PlaceServiceImpl implements PlaceService {
                     .openingHours(resolveOpeningHours(p.getOpeningHours()))
                     .telNum(p.getTelNum())
                     .categoryId(p.getCategory().getCategoryId())
-                    .latitude(p.getLocationX())
-                    .longitude(p.getLocationY())
+                    .latitude(p.getLocationY())
+                    .longitude(p.getLocationX())
                     .imageUrl(imageUrl)
                     .isBookMarked(isBookmarked)
                     .build();
