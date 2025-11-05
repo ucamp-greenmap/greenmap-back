@@ -9,4 +9,9 @@ public interface SignUpService {
     SignUpResponse signup(SignUpRequest request);
 
     BasicLoginResponse login(BasicLoginRequest request);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByNickname(String nickname);
+
 }
