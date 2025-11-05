@@ -157,7 +157,7 @@ public class VerificationServiceImpl implements VerificationService{
         // Point, carbonSave 계산
         Long pointAmount = (long) ((double) carRequest.getChargeFee() / 100);
         Long carbonSave = null;
-        if (carRequest.getChargeAmount() == null) {
+        if (carRequest.getChargeAmount() == 0) {
             carbonSave = (long) (Math.ceil((double) carRequest.getChargeFee() / 100));
         } else {
             carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
