@@ -11,6 +11,9 @@ public class VoucherDto {
     private String imageUrl;
     private String name;
     private Long price;
+    private String category;
+    private String brand;
+    private Boolean popular;
 
     public static VoucherDto fromEntity(Voucher voucher) {
         return VoucherDto.builder()
@@ -18,6 +21,9 @@ public class VoucherDto {
                 .imageUrl(voucher.getImage().getImageUrl())
                 .name(voucher.getName())
                 .price(voucher.getPrice())
+                .category(voucher.getCategory())
+                .brand(voucher.getBrand())
+                .popular(voucher.getPopular())
                 .build();
     }
 }
