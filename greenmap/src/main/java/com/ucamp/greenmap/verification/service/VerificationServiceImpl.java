@@ -66,7 +66,7 @@ public class VerificationServiceImpl implements VerificationService{
         // 필요한 엔티티 조회
         Category category = categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(
                 () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        Place place = placeRepository.findByCategory_CategoryId(category.getCategoryId()).orElseThrow(
+        Place place = placeRepository.findFirstByCategory_CategoryId(category.getCategoryId()).orElseThrow(
                 () -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
 
         Member member = Member.builder()
@@ -140,10 +140,15 @@ public class VerificationServiceImpl implements VerificationService{
         validate.setCreatedAt();
         validateRepository.save(validate);
 
+        CategoryName categoryName = switch (carRequest.getCategory()) {
+            case "EVCAR" -> CategoryName.EVCAR;
+            case "HCAR" -> CategoryName.HCAR;
+            default -> throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
+        };
         // 필요한 엔티티 조회
-        Category category = categoryRepository.findByCategoryName(CategoryName.CAR).orElseThrow(
+        Category category = categoryRepository.findByCategoryName(categoryName).orElseThrow(
                 () -> new IllegalArgumentException("카테고리를 찾을 수 없습니다."));
-        Place place = placeRepository.findByCategory_CategoryId(category.getCategoryId()).orElseThrow(
+        Place place = placeRepository.findFirstByCategory_CategoryId(category.getCategoryId()).orElseThrow(
                 () -> new IllegalArgumentException("장소를 찾을 수 없습니다."));
         Member member = Member.builder()
                 .memberId(memberId)
