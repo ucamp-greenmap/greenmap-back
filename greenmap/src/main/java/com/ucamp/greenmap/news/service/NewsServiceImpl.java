@@ -101,6 +101,7 @@ public class NewsServiceImpl implements NewsService {
 
         // 이미 읽은 뉴스인지 확인 및 isRead 설정
         for (NewsResponse.NewsItem item : newsList) {
+            item.setTitle(removeHtmlTags(item.getTitle()));
             if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), memberId)) {
                 item.setRead(true);
             }
@@ -114,7 +115,7 @@ public class NewsServiceImpl implements NewsService {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
-                        .queryParam("query", "환경")
+                        .queryParam("query", "기후 OR 생태 OR 탄소 OR 오염 OR 친환경 OR ESG")
                         .queryParam("display", howManyNews)
                         .build())
                 .header("X-Naver-Client-Id", clientId)
