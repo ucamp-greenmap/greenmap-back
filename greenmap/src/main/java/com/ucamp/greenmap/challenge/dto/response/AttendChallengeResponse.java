@@ -12,5 +12,6 @@ import java.util.List;
 public class AttendChallengeResponse {
     private Long memberId;
     private List<ChallengeDetail> challenges;
+    private Long memberChallengeId;
 }
 
