@@ -25,4 +25,8 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
 
    boolean existsById(Long memberId);
 
+    @Query("SELECT CASE WHEN m.memberId = 1 THEN TRUE ELSE FALSE END FROM Member m WHERE m.memberId = :memberId")
+    boolean isMemberOne(Long memberId);
+
+
 }
