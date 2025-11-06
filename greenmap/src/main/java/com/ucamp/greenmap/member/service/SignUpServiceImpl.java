@@ -1,5 +1,6 @@
 package com.ucamp.greenmap.member.service;
 
+import com.ucamp.greenmap.Kakao.JwtTokenProvider;
 import com.ucamp.greenmap.badge.domain.Badge;
 import com.ucamp.greenmap.badge.domain.MemberBadge;
 import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
@@ -20,17 +21,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class SignUpServiceImpl implements SignUpService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProviderBasic jwtTokenProvider;
+    private final JwtTokenProviderBasic jwtTokenProviderBasic;
     private final ImageRepository imageRepository;
     private final PointRepository pointRepository;
     private final MemberBadgeRepository memberBadgeRepository;
     private final CategoryRepository categoryRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public SignUpResponse signup(SignUpRequest request) {
@@ -87,7 +91,9 @@ public class SignUpServiceImpl implements SignUpService {
         memberBadgeRepository.save(memberBadge);
 
         //  JWT 발급
-        String token = jwtTokenProvider.createToken(member.getMemberId());
+        String token = jwtTokenProvider.accessTokenGenerate(member.getMemberId(),
+                new Date(System.currentTimeMillis() + 1000L * 60 * 60)
+        );
 
         //  DTO 반환
         return SignUpResponse.builder()
@@ -135,7 +141,10 @@ public class SignUpServiceImpl implements SignUpService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtTokenProvider.createToken(member.getMemberId());
+        String token = jwtTokenProvider.accessTokenGenerate(member.getMemberId(),
+                new Date(System.currentTimeMillis() + 1000L * 60 * 60)
+        );
+
 
         return BasicLoginResponse.builder()
                 .memberId(member.getMemberId())
