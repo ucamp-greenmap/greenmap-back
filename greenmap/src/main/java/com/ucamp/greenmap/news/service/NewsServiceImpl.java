@@ -101,6 +101,7 @@ public class NewsServiceImpl implements NewsService {
 
         // 이미 읽은 뉴스인지 확인 및 isRead 설정
         for (NewsResponse.NewsItem item : newsList) {
+            item.setTitle(removeHtmlTags(item.getTitle()));
             if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), memberId)) {
                 item.setRead(true);
             }
