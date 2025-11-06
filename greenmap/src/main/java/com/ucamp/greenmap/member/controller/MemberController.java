@@ -29,9 +29,9 @@ public class MemberController {
     }
 
     @PutMapping("/deactivate")
-    public ResponseEntity<MemberResponse> deactivateUser(@AuthenticationPrincipal Long memberId) {
+    public ResponseEntity<ApiResponse<MemberResponse>> deactivateUser(@AuthenticationPrincipal Long memberId) {
         MemberResponse response = memberService.deactivateUser(memberId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success("회원탈퇴 성공",response));
     }
 
     @PutMapping
