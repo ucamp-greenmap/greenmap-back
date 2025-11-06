@@ -103,6 +103,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
 
             // DTO에 넣기
             ChallengeDetail attendChallengeDetail = ChallengeDetail.builder()
+                    .memberChallengeId(memberChallenge.getMemberChallengeId())
                     .challengeId(challenge.getChallengeId())
                     .challengeName(challenge.getChallengeName())
                     .description(challenge.getDescription())

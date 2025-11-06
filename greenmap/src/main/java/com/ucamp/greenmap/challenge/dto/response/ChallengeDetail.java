@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class ChallengeDetail {
+    private Long memberChallengeId;
     private Long challengeId;
     private String challengeName;
     private String description;
