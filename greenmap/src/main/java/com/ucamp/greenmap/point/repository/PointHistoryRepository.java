@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +15,8 @@ public interface PointHistoryRepository extends JpaRepository<PointHistory, Long
 
     List<PointHistory> findByMember_MemberIdAndCategory_CategoryIdInOrderByCreatedAtDesc(Long memberId, List<Long> categoryIds);
 
-    Optional<PointHistory> findByLogId(Long logId);
+    @Query(value = "SELECT * FROM point_history ph WHERE ph.log_id = :logId AND ph.category_id IN (1, 2, 3, 4, 5)", nativeQuery = true)
+    Optional<PointHistory> findByLogId(@Param("logId") Long logId);
 
     //---------------------------------마이페이지-------------------------------------------
 
