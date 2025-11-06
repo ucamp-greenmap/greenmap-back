@@ -37,6 +37,7 @@ public class MemberServiceImpl implements MemberService {
         // 활성/비활성 토글
         member.setIsActive(!member.getIsActive());
         member.setUpdatedAt(LocalDateTime.now());
+        System.out.println("memberId : " + memberId);
 
         memberRepository.save(member);
 
