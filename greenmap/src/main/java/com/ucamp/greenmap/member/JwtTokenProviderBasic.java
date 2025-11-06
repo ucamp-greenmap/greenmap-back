@@ -23,8 +23,8 @@ public class JwtTokenProviderBasic {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public String createToken(Long memberId) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(memberId));
+    public String createToken(String email) {
+        Claims claims = Jwts.claims().setSubject(email);
         Date now = new Date();
 
         return Jwts.builder()
