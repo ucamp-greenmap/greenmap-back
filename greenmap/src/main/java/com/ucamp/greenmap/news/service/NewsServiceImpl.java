@@ -27,6 +27,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -94,6 +95,11 @@ public class NewsServiceImpl implements NewsService {
             newsList.removeLast();
         }
 
+        // HTML 태그 제거
+        for (NewsResponse.NewsItem item : newsList) {
+            item.setTitle(removeHtmlTags(item.getTitle()));
+        }
+
         // 로그인하지 않은 사용자일 경우 isRead 체크 없이 응답 반환
         if (memberId == null) {
             return newsResponse;
@@ -101,11 +107,14 @@ public class NewsServiceImpl implements NewsService {
 
         // 이미 읽은 뉴스인지 확인 및 isRead 설정
         for (NewsResponse.NewsItem item : newsList) {
-            item.setTitle(removeHtmlTags(item.getTitle()));
             if (newsRepository.existsByNewsTitleAndMember_MemberId(item.getTitle(), memberId)) {
                 item.setRead(true);
             }
         }
+
+        newsResponse.setLeftTimes(3L - newsRepository.countByMember_MemberIdAndCreatedAtBetween(memberId, LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()));
+
+        log.info("newsResponse.getLeftTimes() = " + newsResponse.getLeftTimes());
 
         // 성공 응답 반환
         return newsResponse;
@@ -115,7 +124,7 @@ public class NewsServiceImpl implements NewsService {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
-                        .queryParam("query", "기후 OR 생태 OR 탄소 OR 오염 OR 친환경 OR ESG")
+                        .queryParam("query", "탄소 중립")
                         .queryParam("display", howManyNews)
                         .build())
                 .header("X-Naver-Client-Id", clientId)
@@ -136,10 +145,18 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public String viewNews(Long memberId, NewsRequest request) {
+
+        log.info("ViewNews memberId = " + memberId);
+
         // 필요한 엔티티 생성 및 조회
         Member memberRef = Member.builder().memberId(memberId).build();
         Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow(
                 () -> new IllegalStateException("NEWS 카테고리가 DB에 없습니다."));
+
+        // 이미 본 뉴스인지 검증
+        if (newsRepository.existsByNewsTitleAndMember_MemberId(request.getTitle(), memberId)) {
+            throw new IllegalStateException("이미 조회한 뉴스입니다.");
+        }
 
         // 뉴스 뷰 로그 저장
         NewsViewLog log = NewsViewLog.builder()
