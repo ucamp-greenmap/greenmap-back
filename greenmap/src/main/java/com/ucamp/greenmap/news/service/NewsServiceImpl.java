@@ -141,6 +141,11 @@ public class NewsServiceImpl implements NewsService {
         Category category = categoryRepository.findByCategoryName(CategoryName.NEWS).orElseThrow(
                 () -> new IllegalStateException("NEWS 카테고리가 DB에 없습니다."));
 
+        // 이미 본 뉴스인지 검증
+        if (newsRepository.existsByNewsTitleAndMember_MemberId(request.getTitle(), memberId)) {
+            throw new IllegalStateException("이미 조회한 뉴스입니다.");
+        }
+
         // 뉴스 뷰 로그 저장
         NewsViewLog log = NewsViewLog.builder()
                 .member(memberRef)
