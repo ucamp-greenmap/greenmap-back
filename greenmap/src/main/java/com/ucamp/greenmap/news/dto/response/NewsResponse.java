@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class NewsResponse {
     private String lastBuildDate;
+    private Long leftTimes = null;
     private List<NewsItem> items;
 
     @Data
