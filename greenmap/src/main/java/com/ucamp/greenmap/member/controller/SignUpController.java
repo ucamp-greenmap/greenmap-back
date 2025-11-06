@@ -21,7 +21,7 @@ public class SignUpController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<SignUpResponse>> signUp(
-            @RequestParam SignUpRequest request){
+            @RequestBody SignUpRequest request){
 
         SignUpResponse response = signUpService.signup(request);
         return ResponseEntity.ok(ApiResponse.success("일반 회원가입 성공 ",response));

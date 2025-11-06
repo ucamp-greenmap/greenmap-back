@@ -13,7 +13,7 @@ public class AdminServiceImpl implements AdminService{
     private final MemberRepository memberRepository;
 
     public AdminResponse getAdmin(Long memberId) {
-        boolean isExist = memberRepository.existsById(memberId);
+        boolean isExist = memberRepository.isMemberOne(memberId);
         return AdminResponse.builder()
                 .result(isExist)
                 .build();

@@ -87,7 +87,7 @@ public class SignUpServiceImpl implements SignUpService {
         memberBadgeRepository.save(memberBadge);
 
         //  JWT 발급
-        String token = jwtTokenProvider.createToken(member.getEmail());
+        String token = jwtTokenProvider.createToken(member.getMemberId());
 
         //  DTO 반환
         return SignUpResponse.builder()
@@ -135,7 +135,7 @@ public class SignUpServiceImpl implements SignUpService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = jwtTokenProvider.createToken(member.getEmail());
+        String token = jwtTokenProvider.createToken(member.getMemberId());
 
         return BasicLoginResponse.builder()
                 .memberId(member.getMemberId())

@@ -9,6 +9,7 @@ import com.ucamp.greenmap.member.dto.request.MemberRequest;
 import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -34,8 +36,9 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse deactivateUser(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
+        log.info("memberId : "+memberId);
         // 활성/비활성 토글
-        member.setIsActive(!member.getIsActive());
+        member.setIsActive(Boolean.FALSE);
         member.setUpdatedAt(LocalDateTime.now());
 
         memberRepository.save(member);
