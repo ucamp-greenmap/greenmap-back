@@ -1,6 +1,7 @@
 package com.ucamp.greenmap.point.controller;
 
 import com.ucamp.greenmap.common.dto.ApiResponse;
+import com.ucamp.greenmap.point.dto.request.ShopRequest;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.*;
 import com.ucamp.greenmap.point.enums.Type;
@@ -60,6 +61,12 @@ public class PointController {
     @GetMapping("/carbon")
     public ResponseEntity<ApiResponse<CarbonInfoResponse>> getCarbonInfo(@AuthenticationPrincipal Long memberId) {
         CarbonInfoResponse response = pointService.getCarbonInfo(memberId);
+        return ResponseEntity.ok(ApiResponse.success("성공", response));
+    }
+
+    @PostMapping("/shop")
+    public ResponseEntity<ApiResponse<ShopAddResponse>> addShopVoucher(@AuthenticationPrincipal Long memberId, @RequestBody ShopRequest request) {
+        ShopAddResponse response = pointService.addShopVoucher(request, memberId);
         return ResponseEntity.ok(ApiResponse.success("성공", response));
     }
 }
