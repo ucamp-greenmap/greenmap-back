@@ -227,20 +227,20 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
             throw new RuntimeException("챌린지 목표가 설정되지 않았습니다.");
         }
 
-        // 이번 증가치 계산 = (추가 회수 / 목표) * 100
+        // 이번 증가치 계산
         Long increaseProgress = times;
 
         // progress 누적
         Long newProgress = memberChallenge.getProgress() + increaseProgress;
 
         // 100 이상이면 100으로 고정
-        newProgress = Math.min(newProgress, 100);
+        newProgress = Math.min(newProgress, memberChallenge.getChallenge().getSuccess());
 
         // progress만 업데이트
         memberChallenge.updateProgress(newProgress);
 
         // 보상 조건: 처음 100 도달 & 아직 활성 상태인 경우
-        if (newProgress >= 100 && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
+        if (newProgress >= memberChallenge.getChallenge().getSuccess() && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
 
             Member member = memberChallenge.getMember();
             Challenge challenge = memberChallenge.getChallenge();
