@@ -4,6 +4,9 @@ import com.ucamp.greenmap.badge.domain.Badge;
 import com.ucamp.greenmap.badge.domain.MemberBadge;
 import com.ucamp.greenmap.badge.repository.BadgeRepository;
 import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
+import com.ucamp.greenmap.challenge.domain.MemberChallenge;
+import com.ucamp.greenmap.challenge.repository.MemberChallengeRepository;
+import com.ucamp.greenmap.challenge.service.MemberChallengeService;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
@@ -31,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -45,6 +49,8 @@ public class VerificationServiceImpl implements VerificationService{
     private final PointHistoryRepository pointHistoryRepository;
     private final MemberBadgeRepository memberBadgeRepository;
     private final BadgeRepository badgeRepository;
+    private final MemberChallengeRepository memberChallengeRepository;
+    private final MemberChallengeService memberChallengeService;
 
     @Override
     public VerificationResponse verifyBike(Long memberId, BikeRequest bikeRequest) {
@@ -114,6 +120,23 @@ public class VerificationServiceImpl implements VerificationService{
         ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
         if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
             memberBadge.updateBadge(nextBadge);
+        }
+
+        // 챌린지 있으면 진행률 수정
+        List<MemberChallenge> memberChallenges = memberChallengeRepository.findAttendChallengesByMemberId(memberId);
+        List<MemberChallenge> challenges = new ArrayList<>();
+
+        // 따릉이 챌린지만 필터링
+        for (MemberChallenge memberChallenge : memberChallenges) {
+            String description = memberChallenge.getChallenge().getDescription();
+            if (Objects.equals(description.split(" ")[0], "따릉이")) {
+                challenges.add(memberChallenge);
+            }
+        }
+
+        // 챌린지 진행률 업데이트
+        for (MemberChallenge mc : challenges) {
+            memberChallengeService.progressChallenge(memberId, mc.getMemberChallengeId(), bikeRequest.getDistance());
         }
 
         // Response 반환
@@ -205,6 +228,24 @@ public class VerificationServiceImpl implements VerificationService{
             memberBadge.updateBadge(nextBadge);
         }
 
+        // 챌린지 있으면 진행률 수정
+        List<MemberChallenge> memberChallenges = memberChallengeRepository.findAttendChallengesByMemberId(memberId);
+        List<MemberChallenge> challenges = new ArrayList<>();
+
+        // 충전소 관련 챌린지만 필터링
+        for (MemberChallenge memberChallenge : memberChallenges) {
+            String description = memberChallenge.getChallenge().getDescription();
+            if (Objects.equals(description.split(" ")[0], "전기차") ||
+                    Objects.equals(description.split(" ")[0], "수소차")) {
+                challenges.add(memberChallenge);
+            }
+        }
+
+        // 챌린지 진행률 업데이트
+        for (MemberChallenge mc : challenges) {
+            memberChallengeService.progressChallenge(memberId, mc.getMemberChallengeId(), carRequest.getChargeFee());
+        }
+
         // Response 반환
         return VerificationResponse.builder()
                 .point(pointAmount)
@@ -290,6 +331,24 @@ public class VerificationServiceImpl implements VerificationService{
         ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
         if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
             memberBadge.updateBadge(nextBadge);
+        }
+
+        // 챌린지 있으면 진행률 수정
+        List<MemberChallenge> memberChallenges = memberChallengeRepository.findAttendChallengesByMemberId(memberId);
+        List<MemberChallenge> challenges = new ArrayList<>();
+
+        // 충전소 관련 챌린지만 필터링
+        for (MemberChallenge memberChallenge : memberChallenges) {
+            String chalDesc = memberChallenge.getChallenge().getDescription();
+            if (Objects.equals(chalDesc.split(" ")[0], "재활용센터") ||
+                    Objects.equals(chalDesc.split(" ")[0], "제로웨이스트")) {
+                challenges.add(memberChallenge);
+            }
+        }
+
+        // 챌린지 진행률 업데이트
+        for (MemberChallenge mc : challenges) {
+            memberChallengeService.progressChallenge(memberId, mc.getMemberChallengeId(), shopRequest.getPrice());
         }
 
         // Response 반환

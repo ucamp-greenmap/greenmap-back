@@ -1,5 +1,8 @@
-package com.ucamp.greenmap.Kakao;
+package com.ucamp.greenmap.common.config;
 
+import com.ucamp.greenmap.Kakao.JwtAuthenticationFilter;
+import com.ucamp.greenmap.Kakao.OAuth2FailureHandler;
+import com.ucamp.greenmap.Kakao.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
