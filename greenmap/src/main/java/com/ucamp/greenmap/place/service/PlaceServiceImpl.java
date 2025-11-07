@@ -8,13 +8,16 @@ import com.ucamp.greenmap.place.dto.response.PlaceDto;
 import com.ucamp.greenmap.place.dto.response.PlaceListDto;
 import com.ucamp.greenmap.place.dto.response.PlaceSearchDto;
 import com.ucamp.greenmap.place.repository.PlaceRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -55,15 +58,21 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    @Transactional
     public PlaceListDto getAllPlaces(Long memberId, Double longitude, Double latitude) {
+        // 1) 북마크 된 placeId들을 한 번에
+        Set<Long> bookmarked = (memberId == null)
+                ? Set.of()
+                : new HashSet<>(bookmarkRepository.findPlaceIdsByMemberId(memberId));
 
-        List<Place> place = placeRepository.findAll();
+        // 2) 장소도 한 번에 (fetch join 버전 권장)
+        List<Place> placesEntity = placeRepository.findAllWithJoins(); // 또는 findAll()
 
-        List<PlaceDto> places = place.stream().map(p -> {
-            boolean isBookmarked = bookmarkRepository.existsByMember_MemberIdAndPlace_PlaceId(memberId, p.getPlaceId());
-            // 거리 계산
+        // 3) 매핑
+        List<PlaceDto> places = placesEntity.stream().map(p -> {
             double distanceKm = haversineKm(latitude, longitude, p.getLocationY(), p.getLocationX());
-            double distanceRounded = Math.round(distanceKm * 10.0) / 10.0; // 소수 1자리
+            double distanceRounded = Math.round(distanceKm * 10.0) / 10.0;
+
             String imageUrl = (p.getImage() != null) ? p.getImage().getImageUrl() : null;
 
             return PlaceDto.builder()
@@ -77,7 +86,7 @@ public class PlaceServiceImpl implements PlaceService {
                     .latitude(p.getLocationY())
                     .longitude(p.getLocationX())
                     .imageUrl(imageUrl)
-                    .isBookMarked(isBookmarked)
+                    .isBookMarked(bookmarked.contains(p.getPlaceId()))
                     .build();
         }).toList();
         return PlaceListDto.builder()
@@ -85,6 +94,7 @@ public class PlaceServiceImpl implements PlaceService {
                 .places(places)
                 .build();
     }
+
 
     @Override
     public PlaceSearchDto searchPlaces(String search) {
