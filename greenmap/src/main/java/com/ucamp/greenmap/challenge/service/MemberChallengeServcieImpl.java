@@ -228,7 +228,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
         }
 
         // 이번 증가치 계산 = (추가 회수 / 목표) * 100
-        Long increaseProgress = (long) Math.ceil((double) times / goal * 100);
+        Long increaseProgress = times;
 
         // progress 누적
         Long newProgress = memberChallenge.getProgress() + increaseProgress;
