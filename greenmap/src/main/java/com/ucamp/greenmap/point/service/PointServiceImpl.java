@@ -3,9 +3,12 @@ package com.ucamp.greenmap.point.service;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
+import com.ucamp.greenmap.image.domain.Image;
+import com.ucamp.greenmap.image.repository.ImageRepository;
 import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.domain.PointHistory;
 import com.ucamp.greenmap.point.domain.Voucher;
+import com.ucamp.greenmap.point.dto.request.ShopRequest;
 import com.ucamp.greenmap.point.dto.request.UsePointRequest;
 import com.ucamp.greenmap.point.dto.response.*;
 import com.ucamp.greenmap.point.enums.Type;
@@ -32,6 +35,7 @@ public class PointServiceImpl implements PointService {
     private final CategoryRepository categoryRepository;
     private final PointHistoryRepository pointHistoryRepository;
     private final HistoryRepository historyRepository;
+    private final ImageRepository imageRepository;
 
     @Override
     @Transactional
@@ -255,6 +259,36 @@ public class PointServiceImpl implements PointService {
                 .recycle(recycle)
                 .bike(bike)
                 .zero(zero)
+                .build();
+    }
+
+    @Override
+    public ShopAddResponse addShopVoucher(ShopRequest request, Long memberId) {
+        Image image = imageRepository.findByImageUrl(request.getImageUrl())
+                .orElseGet(() -> {
+                    Image newImage = Image.builder()
+                            .imageUrl(request.getImageUrl())
+                            .build();
+                    return imageRepository.save(newImage);
+                });
+
+        Voucher voucher = Voucher.builder()
+                .image(image)
+                .price(request.getPrice())
+                .name(request.getName())
+                .category(request.getCategory())
+                .brand(request.getBrand())
+                .popular(request.getPopular())
+                .build();
+
+        return ShopAddResponse.builder()
+                .voucherId(voucherRepository.save(voucher).getVoucherId())
+                .imageUrl(voucher.getImage().getImageUrl())
+                .price(voucher.getPrice())
+                .name(voucher.getName())
+                .category(voucher.getCategory())
+                .brand(voucher.getBrand())
+                .popular(voucher.getPopular())
                 .build();
     }
 }
