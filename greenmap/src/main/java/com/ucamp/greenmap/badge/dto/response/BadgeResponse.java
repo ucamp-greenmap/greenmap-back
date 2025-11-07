@@ -4,17 +4,25 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 public class BadgeResponse {
-    private String name;
-    private Long wholePoint;
-    private Long currentPoint;
-    private String description;
-    private String image_url;
-    private LocalDateTime created_at;
-    // 확장성
-    private Long badge_count;
-    private Long total_badge;
+
+    private String message;
+    private List<BadgeInfo> data;
+
+    @Data
+    @Builder
+    public static class BadgeInfo {
+        private String name;
+        private Long progress;
+        private Long standard;
+        private String description;
+        private String image_url;
+        private LocalDateTime created_at;
+        private Boolean isAcquired;
+        private Boolean isSelected;
+    }
 }
