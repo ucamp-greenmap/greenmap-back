@@ -88,7 +88,7 @@ public class VerificationServiceImpl implements VerificationService{
                 .member(member)
                 .place(place)
                 .category(category)
-                .distance(bikeRequest.getDistance())
+                .distance((long) (bikeRequest.getDistance() * 1000))
                 .carbonSave(carbonSave)
                 .build();
         history.setCreatedAt();
@@ -136,7 +136,7 @@ public class VerificationServiceImpl implements VerificationService{
 
         // 챌린지 진행률 업데이트
         for (MemberChallenge mc : challenges) {
-            memberChallengeService.progressChallenge(memberId, mc.getMemberChallengeId(), bikeRequest.getDistance());
+            memberChallengeService.progressChallenge(memberId, mc.getMemberChallengeId(), (long) (bikeRequest.getDistance() * 1000));
         }
 
         // Response 반환
@@ -187,7 +187,6 @@ public class VerificationServiceImpl implements VerificationService{
             pointAmount = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
             carbonSave = (long) (Math.ceil((double) carRequest.getChargeAmount() / 7));
         }
-
 
         // History 생성 및 저장
         History history = History.builder()
