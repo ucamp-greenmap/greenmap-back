@@ -4,7 +4,6 @@ import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.dto.response.MyPageResponse;
 import com.ucamp.greenmap.member.dto.response.RecodeResponse;
 import com.ucamp.greenmap.point.domain.Point;
-import com.ucamp.greenmap.point.dto.request.MostActiveCategory;
 import com.ucamp.greenmap.point.dto.response.RankingResponse;
 import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
@@ -29,7 +28,8 @@ public class MyPageServiceImpl implements MyPageService {
         MemberResponse member = memberService.getMyInfo(memberId);
         UserInfoResponse point = pointService.getPointInfo(memberId);
         RankingResponse ranking = pointService.getRanking(memberId);
-
+        Point point1 = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new RuntimeException("포인트 정보가 없습니다."));
         return MyPageResponse.builder()
                 .member(
                         MyPageResponse.MemberInfo.builder()
@@ -48,7 +48,7 @@ public class MyPageServiceImpl implements MyPageService {
                 .ranking(
                         MyPageResponse.RankingInfo.builder()
                                 .rank(ranking.getRank())
-                                .point(ranking.getMemberPoint())
+                                .point(point1.getPoint())
                                 .carbonSave(ranking.getCarbonSave())
                                 .build()
                 )
