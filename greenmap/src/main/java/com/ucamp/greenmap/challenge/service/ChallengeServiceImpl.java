@@ -27,6 +27,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .memberCount(0L)
                 .pointAmount(request.getPointAmount())
                 .build();
+        challenge.setUpdatedAt(request.getUpdatedAt());
         challengeRepository.save(challenge);
 
         return ChallengeResponse.builder()
@@ -36,6 +37,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .description(challenge.getDescription())
                 .memberCount(challenge.getMemberCount())
                 .pointAmount(challenge.getPointAmount())
+                .updatedAt(challenge.getUpdatedAt())
                 .build();
 
     }

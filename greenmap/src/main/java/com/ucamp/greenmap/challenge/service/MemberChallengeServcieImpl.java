@@ -229,7 +229,6 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
         // progress 누적
         Long newProgress = memberChallenge.getProgress() + increaseProgress;
 
-        // 100 이상이면 100으로 고정
         newProgress = Math.min(newProgress, memberChallenge.getChallenge().getSuccess());
 
         // progress만 업데이트

@@ -14,6 +14,7 @@ public class ChallengeAvailResponse {
     private Long memberId;
     private Long memberChallengeId;
     private Long challengeId;
+    private Boolean isActive;
 //    private String challengeName;
 //    private String description;
 //    private Long memberCount;
