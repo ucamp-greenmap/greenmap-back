@@ -112,14 +112,35 @@ public class VerificationServiceImpl implements VerificationService{
         point.addCarbonSaveTotal(carbonSave);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(
-                () -> new IllegalArgumentException("멤버 뱃지 정보를 찾을 수 없습니다."));
-        Badge nextBadge = badgeRepository.findById(
-                memberBadge.getBadge().getBadgeId() != 5 ?
-                        memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
-        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
-            memberBadge.updateBadge(nextBadge);
+        // 멤버뱃지 조회
+        List<MemberBadge> memberBadges = memberBadgeRepository.findByMember_MemberId(memberId);
+        // 멤버뱃지 중 자전거 카테고리 뱃지, 포인트 뱃지 진행도 업데이트
+        for (MemberBadge memberBadge : memberBadges) {
+            Badge badge = memberBadge.getBadge();
+            Long requirement = badge.getRequirement();
+            Long progress = memberBadge.getProgress();
+
+            // 자전거 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BIKE) {
+                // 진행도 업데이트
+                progress += (long) (bikeRequest.getDistance() * 1000);
+                // 기준을 넘으면 뱃지 획득 처리
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
+
+            // 포인트 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
+                progress += pointAmount;
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
         }
 
         // 챌린지 있으면 진행률 수정
@@ -217,14 +238,35 @@ public class VerificationServiceImpl implements VerificationService{
         point.addCarbonSaveTotal(carbonSave);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(
-                () -> new IllegalArgumentException("멤버 뱃지 정보를 찾을 수 없습니다."));
-        Badge nextBadge = badgeRepository.findById(
-                memberBadge.getBadge().getBadgeId() != 5 ?
-                        memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
-        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
-            memberBadge.updateBadge(nextBadge);
+        // 멤버뱃지 조회
+        List<MemberBadge> memberBadges = memberBadgeRepository.findByMember_MemberId(memberId);
+        // 멤버뱃지 중 차 카테고리 뱃지, 포인트 뱃지 진행도 업데이트
+        for (MemberBadge memberBadge : memberBadges) {
+            Badge badge = memberBadge.getBadge();
+            Long requirement = badge.getRequirement();
+            Long progress = memberBadge.getProgress();
+
+            // 차 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory() == category) {
+                // 진행도 업데이트
+                progress += (long) (carRequest.getChargeAmount());
+                // 기준을 넘으면 뱃지 획득 처리
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
+
+            // 포인트 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
+                progress += pointAmount;
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
         }
 
         // 챌린지 있으면 진행률 수정
@@ -322,14 +364,35 @@ public class VerificationServiceImpl implements VerificationService{
         point.addCarbonSaveTotal(carbonSave);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId).orElseThrow(() ->
-                new IllegalArgumentException("멤버 뱃지 정보를 찾을 수 없습니다."));
-        Badge nextBadge = badgeRepository.findById(
-                memberBadge.getBadge().getBadgeId() != 5 ?
-                        memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow(() -> new IllegalArgumentException("다음 뱃지 정보를 찾을 수 없습니다."));
-        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
-            memberBadge.updateBadge(nextBadge);
+        // 멤버뱃지 조회
+        List<MemberBadge> memberBadges = memberBadgeRepository.findByMember_MemberId(memberId);
+        // 멤버뱃지 중 가게 카테고리 뱃지, 포인트 뱃지 진행도 업데이트
+        for (MemberBadge memberBadge : memberBadges) {
+            Badge badge = memberBadge.getBadge();
+            Long requirement = badge.getRequirement();
+            Long progress = memberBadge.getProgress();
+
+            // 가게 카테고리 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory() == category) {
+                // 진행도 업데이트
+                progress += (long) (shopRequest.getPrice());
+                // 기준을 넘으면 뱃지 획득 처리
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
+
+            // 포인트 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
+                progress += pointAmount;
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
         }
 
         // 챌린지 있으면 진행률 수정
