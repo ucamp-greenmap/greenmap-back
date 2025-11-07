@@ -60,7 +60,7 @@ public class MemberChallengeController {
     public ResponseEntity<ApiResponse<EndDateChallengeResponse>> endDateChallenge(
             @AuthenticationPrincipal Long memberId)
     {
-        EndDateChallengeResponse response = memberChallengeServcie.endDateChallenge(memberId);
+        EndDateChallengeResponse response = memberChallengeServcie.endDateChallenge();
         return ResponseEntity.ok(ApiResponse.success("기한지난 챌린지 자동 종료", response));
     }
 

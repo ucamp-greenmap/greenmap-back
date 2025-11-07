@@ -168,24 +168,20 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
 
     @Override
     @Transactional
-    public EndDateChallengeResponse endDateChallenge(Long memberId) {
-
-        // 1. 회원 확인
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
+    public EndDateChallengeResponse endDateChallenge() {
+        //끝난 챌린지 memberId받지 않고 구현
 
         // 2. 마감 지난 챌린지 조회 (만료될 챌린지들)
         List<MemberChallenge> expiredBeforeUpdate =
-                memberChallengeRepository.findExpiredChallenges(memberId);
+                memberChallengeRepository.findExpiredChallenges();
 
         if (expiredBeforeUpdate.isEmpty()) {
             return EndDateChallengeResponse.builder()
-                    .memberId(memberId)
                     .build(); // 만료된 챌린지 없으면 기본 반환
         }
 
         // 3. 만료 처리 실행 (isActive = false 업데이트)
-        memberChallengeRepository.updateExpiredChallenges(memberId);
+        memberChallengeRepository.updateExpiredChallenges();
 
         // 4. 가장 최근에 만료된 챌린지 기준 (가장 늦게 끝난 챌린지)
         MemberChallenge expired = expiredBeforeUpdate.get(0);
@@ -193,7 +189,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
         Challenge challenge = expired.getChallenge();
 
         return EndDateChallengeResponse.builder()
-                .memberId(memberId)
+                .memberId(expired.getMember().getMemberId())
                 .memberChallengeId(expired.getMemberChallengeId())
                 .challengeId(challenge.getChallengeId())
                 .challengeName(challenge.getChallengeName())

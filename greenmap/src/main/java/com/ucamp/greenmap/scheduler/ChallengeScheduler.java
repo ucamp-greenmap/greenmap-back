@@ -19,7 +19,7 @@ public class ChallengeScheduler {
     @Scheduled(cron = "0 0 */6 * * *")
     public void autoCloseChallenges() {
         memberRepository.findAll().forEach(
-                member -> memberChallengeRepository.updateExpiredChallenges(member.getMemberId())
+                member -> memberChallengeRepository.updateExpiredChallenges()
         );
     }
 
