@@ -24,23 +24,21 @@ public interface MemberChallengeRepository extends JpaRepository<MemberChallenge
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(value = """
-        UPDATE member_challenge mc
-        JOIN challenge c ON mc.challenge_id = c.challenge_id
-        SET mc.is_active = false
-        WHERE mc.member_id = :memberId
-          AND DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
-    """, nativeQuery = true)
-    void updateExpiredChallenges(Long memberId);
+    UPDATE member_challenge mc
+    JOIN challenge c ON mc.challenge_id = c.challenge_id
+    SET mc.is_active = false
+      AND DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
+""", nativeQuery = true)
+    void updateExpiredChallenges();
 
     @Query(value = """
-        SELECT mc.*
-        FROM member_challenge mc
-        JOIN challenge c ON mc.challenge_id = c.challenge_id
-        WHERE mc.member_id = :memberId
-          AND DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
-        ORDER BY DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) DESC
-    """, nativeQuery = true)
-    List<MemberChallenge> findExpiredChallenges(Long memberId);
+SELECT mc.*
+    FROM member_challenge mc
+    JOIN challenge c ON mc.challenge_id = c.challenge_id
+      AND DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
+    ORDER BY DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) DESC
+""", nativeQuery = true)
+    List<MemberChallenge> findExpiredChallenges();
 
     @Query("SELECT mc FROM MemberChallenge mc WHERE mc.member.memberId = :memberId AND mc.memberChallengeId = :memberChallengeId")
     Optional<MemberChallenge> findChallengeByMember(
