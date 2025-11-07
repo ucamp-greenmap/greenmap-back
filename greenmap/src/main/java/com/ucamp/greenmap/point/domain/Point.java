@@ -66,4 +66,9 @@ public class Point extends BaseEntity {
         this.monthPoint += getPoint;
         this.wholePoint += getPoint;
     }
+
+    public void resetMonthPoint() {
+        this.monthPoint = 0L;
+        this.pointTimes = 0L;
+    }
 }
