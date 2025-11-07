@@ -40,6 +40,10 @@ public class MemberBadge extends BaseEntity {
         this.updatedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 
+    public void addBadgeProgress(Long progress) {
+        this.progress = progress;
+    }
+
     public void selectBadge() {
         this.isSelected = true;
         this.updatedAt = LocalDateTime.now();

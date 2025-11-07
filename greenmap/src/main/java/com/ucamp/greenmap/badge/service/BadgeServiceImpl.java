@@ -51,7 +51,10 @@ public class BadgeServiceImpl implements BadgeService {
             // 멤버가 획득한 뱃지인지 확인
             for (MemberBadge mb : memberBadge) {
                 if (mb.getBadge().getBadgeId().equals(badge.getBadgeId())) {
-                    isAcquired = true;
+                    // 획득한 뱃지인 경우 정보 업데이트 -> isActive가 false면 획득한 뱃지
+                    if (!mb.getIsActive()) {
+                        isAcquired = true;
+                    }
                     progress = mb.getProgress();
                     createdAt = mb.getCreatedAt();
                     if (mb.getIsSelected()) {

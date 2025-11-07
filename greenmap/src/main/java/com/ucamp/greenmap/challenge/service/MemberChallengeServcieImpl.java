@@ -261,17 +261,24 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
             pointHistoryRepository.save(pointHistory);
 
 
-             //뱃지 업데이트
-            MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId)
-                    .orElseThrow();
-            Badge nextBadge = badgeRepository.findById(
-                    memberBadge.getBadge().getBadgeId() != 5 ?
-                            memberBadge.getBadge().getBadgeId() + 1 : 5
-            ).orElseThrow();
+            // 뱃지 최신화
+            // 멤버뱃지 조회
+            List<MemberBadge> memberBadges = memberBadgeRepository.findByMember_MemberId(memberId);
+            // 멤버뱃지 중 포인트 뱃지 진행도 업데이트
+            for (MemberBadge memberBadge : memberBadges) {
+                Badge badge = memberBadge.getBadge();
+                Long requirement = badge.getRequirement();
+                Long progress = memberBadge.getProgress();
 
-            if (point.getWholePoint() >= nextBadge.getRequirement()
-                    && memberBadge.getBadge().getBadgeId() != 5) {
-                memberBadge.updateBadge(nextBadge);
+                // 포인트 뱃지 진행도 업데이트
+                if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
+                    progress += rewardPoint;
+                    if (progress >= requirement) {
+                        // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                        memberBadge.setIsActive(false);
+                    }
+                    memberBadge.addBadgeProgress(progress);
+                }
             }
 
             // 챌린지 완료 처리 (여기서만 isActive 바꿈)

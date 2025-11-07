@@ -31,7 +31,7 @@ public class ChallengeScheduler {
     }
 
     // 매일 자정 실행
-    @Scheduled(cron = "* * */12 * * *")
+    @Scheduled(cron = "0 0 */12 * * *")
     @Transactional
     public void autoCloseChallenge() {
 //        List<Challenge> expiredChallenges = challengeRepository.findExpiredChallenges();
