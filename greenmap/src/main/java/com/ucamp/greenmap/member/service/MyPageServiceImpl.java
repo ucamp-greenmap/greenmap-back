@@ -28,8 +28,7 @@ public class MyPageServiceImpl implements MyPageService {
         MemberResponse member = memberService.getMyInfo(memberId);
         UserInfoResponse point = pointService.getPointInfo(memberId);
         RankingResponse ranking = pointService.getRanking(memberId);
-        Point point1 = pointRepository.findByMember_MemberId(memberId)
-                .orElseThrow(() -> new RuntimeException("포인트 정보가 없습니다."));
+
         return MyPageResponse.builder()
                 .member(
                         MyPageResponse.MemberInfo.builder()
@@ -48,12 +47,14 @@ public class MyPageServiceImpl implements MyPageService {
                 .ranking(
                         MyPageResponse.RankingInfo.builder()
                                 .rank(ranking.getRank())
-                                .point(point1.getPoint())
+                                .point(ranking.getMemberPoint())
                                 .carbonSave(ranking.getCarbonSave())
                                 .build()
                 )
                 .build();
     }
+
+
     @Override
     public RecodeResponse getRecode(Long memberId) {
         // 회원 정보
