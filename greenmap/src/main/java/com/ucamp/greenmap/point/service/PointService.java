@@ -23,5 +23,5 @@ public interface PointService {
 
     ShopAddResponse addShopVoucher(ShopRequest request, Long memberId);
 
-    MyRankingResponse getMyRanking(Long memberId);
+//    MyRankingResponse getMyRanking(Long memberId);
 }

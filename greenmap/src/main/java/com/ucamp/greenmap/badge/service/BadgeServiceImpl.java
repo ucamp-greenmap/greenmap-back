@@ -15,11 +15,13 @@ import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -86,6 +88,7 @@ public class BadgeServiceImpl implements BadgeService {
     @Override
     public String addBadge(BadgeRequest request) {
         // 카테고리 조회
+        log.info("request.getDesc 어쩌구 : " + request.getDescription().split(" ")[0]);
         Category category = categoryRepository.findByCategoryName(switch (request.getDescription().split(" ")[0]) {
             case "따릉이" -> CategoryName.BIKE;
             case "전기차" -> CategoryName.EVCAR;
