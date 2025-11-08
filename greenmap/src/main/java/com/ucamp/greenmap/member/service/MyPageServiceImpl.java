@@ -4,6 +4,7 @@ import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.dto.response.MyPageResponse;
 import com.ucamp.greenmap.member.dto.response.RecodeResponse;
 import com.ucamp.greenmap.point.domain.Point;
+import com.ucamp.greenmap.point.dto.response.MyRankingResponse;
 import com.ucamp.greenmap.point.dto.response.RankingResponse;
 import com.ucamp.greenmap.point.dto.response.UserInfoResponse;
 import com.ucamp.greenmap.point.repository.PointHistoryRepository;
@@ -27,7 +28,7 @@ public class MyPageServiceImpl implements MyPageService {
     public MyPageResponse getMyPage(Long memberId) {
         MemberResponse member = memberService.getMyInfo(memberId);
         UserInfoResponse point = pointService.getPointInfo(memberId);
-        RankingResponse ranking = pointService.getRanking(memberId);
+        MyRankingResponse ranking = pointService.getMyRanking(memberId);
 
         return MyPageResponse.builder()
                 .member(
