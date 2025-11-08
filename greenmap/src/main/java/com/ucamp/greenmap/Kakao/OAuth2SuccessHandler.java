@@ -3,6 +3,7 @@ package com.ucamp.greenmap.Kakao;
 import com.ucamp.greenmap.Kakao.repository.UserRepository;
 import com.ucamp.greenmap.badge.domain.Badge;
 import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.BadgeRepository;
 import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.image.domain.Image;
 import com.ucamp.greenmap.image.repository.ImageRepository;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.mapping.Bag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -20,9 +22,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -33,6 +33,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final ImageRepository imageRepository;
     private final PointRepository pointRepository;
     private final MemberBadgeRepository memberBadgeRepository;
+    private final BadgeRepository badgeRepository;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -88,11 +89,24 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
             pointRepository.save(point);
 
-            MemberBadge memberBadge = MemberBadge.builder()
-                    .member(saved)
-                    .badge(Badge.builder().badgeId(1L).build())
-                    .build();
-            memberBadgeRepository.save(memberBadge);
+
+            List<Badge> allBadges = badgeRepository.findAll();
+            List<MemberBadge> memberBadges = new ArrayList<>();
+
+            for (Badge badge : allBadges) {
+                MemberBadge mb = MemberBadge.builder()
+                        .member(saved)
+                        .badge(badge)
+                        .progress(0L)
+                        .isSelected(false)
+                        .build();
+                memberBadges.add(mb);
+            }
+
+            memberBadgeRepository.saveAll(memberBadges);
+
+            memberBadgeRepository.saveAll(memberBadges);
+
         } else {
             Image img = user.getImage();
             if (img != null) {
