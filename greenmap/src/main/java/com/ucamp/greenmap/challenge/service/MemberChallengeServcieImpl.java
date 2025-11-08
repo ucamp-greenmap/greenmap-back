@@ -41,7 +41,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public MemberChallengeregis registMemberChallenge(Long memberId, Long challengeId){
+    public MemberChallengeregis registMemberChallenge(Long memberId, Long challengeId) {
         // 1. 회원 조회
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
@@ -69,8 +69,9 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .progress(0L)
                 .build();
     }
+
     @Override
-    public ChallengeAvailResponse availChallenge(Long memberId){
+    public ChallengeAvailResponse availChallenge(Long memberId) {
 
         // 1. 회원 확인
         Member member = memberRepository.findById(memberId)
@@ -127,7 +128,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
     }
 
     @Override
-    public EndChallengeResponse endChallenge(Long memberId){
+    public EndChallengeResponse endChallenge(Long memberId) {
         // 1. 회원 확인
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
@@ -218,27 +219,40 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                     .build();
         }
 
-        Long goal = memberChallenge.getChallenge().getSuccess();
+        Challenge challenge = memberChallenge.getChallenge();
+        Long goal = challenge.getSuccess();
         if (goal == null || goal <= 0) {
             throw new RuntimeException("챌린지 목표가 설정되지 않았습니다.");
         }
 
-        // 이번 증가치 계산
+        // description으로 챌린지 종류 판별
+        String description = challenge.getDescription();
+
+        // progress 증가량
         Long increaseProgress = times;
+
+        // 따릉이 챌린지면 km → m 단위 변환하여 저장
+        boolean isBikeChallenge = description != null && description.startsWith("따릉이");
+        if (isBikeChallenge) {
+            increaseProgress = times * 1000;
+        }
 
         // progress 누적
         Long newProgress = memberChallenge.getProgress() + increaseProgress;
 
-        newProgress = Math.min(newProgress, memberChallenge.getChallenge().getSuccess());
+        // 따릉이는 goal * 1000으로 비교 (2km → 2000m)
+        Long maxProgress = isBikeChallenge ? goal * 1000 : goal;
 
-        // progress만 업데이트
+        // 초과 방지
+        newProgress = Math.min(newProgress, maxProgress);
+
+        // progress 업데이트
         memberChallenge.updateProgress(newProgress);
 
-        // 보상 조건: 처음 100 도달 & 아직 활성 상태인 경우
-        if (newProgress >= memberChallenge.getChallenge().getSuccess() && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
+        // 완료 조건
+        if (newProgress >= maxProgress && Boolean.TRUE.equals(memberChallenge.getIsActive())) {
 
             Member member = memberChallenge.getMember();
-            Challenge challenge = memberChallenge.getChallenge();
             Long rewardPoint = challenge.getPointAmount();
 
             // 포인트 지급
@@ -260,8 +274,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
             pointHistory.setCreatedAt(LocalDateTime.now());
             pointHistoryRepository.save(pointHistory);
 
-
-             //뱃지 업데이트
+            // 뱃지 업데이트
             MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberId)
                     .orElseThrow();
             Badge nextBadge = badgeRepository.findById(
@@ -274,7 +287,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 memberBadge.updateBadge(nextBadge);
             }
 
-            // 챌린지 완료 처리 (여기서만 isActive 바꿈)
+            // 챌린지 완료 처리
             memberChallenge.completeChallenge();
         }
 
@@ -288,10 +301,5 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .isActive(updated.getIsActive())
                 .build();
     }
-
-
-
-
-
 
 }

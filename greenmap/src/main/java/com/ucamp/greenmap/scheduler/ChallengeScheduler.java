@@ -30,7 +30,6 @@ public class ChallengeScheduler {
         );
     }
 
-    // 매일 자정 실행
     @Scheduled(cron = "* * */12 * * *")
     @Transactional
     public void autoCloseChallenge() {
@@ -40,21 +39,27 @@ public class ChallengeScheduler {
 //
 //        challengeRepository.saveAll(expiredChallenges);
 
-        List<Challenge> challenges = challengeRepository.findAll();
+        try {
+            List<Challenge> challenges = challengeRepository.findAll();
 
-        challenges.forEach(challenge -> {
-            log.info("=======================================");
-            log.info("12341" + String.valueOf(challenge.getUpdatedAt().isBefore(LocalDateTime.now())));
-            log.info("12341" + String.valueOf(challenge.getIsActive()));
+            challenges.forEach(challenge -> {
+                try {
+                    // updatedAt이 null이면 비교x
+                    if (challenge.getUpdatedAt() != null &&
+                            challenge.getUpdatedAt().isBefore(LocalDateTime.now()) &&
+                            challenge.getIsActive()){
 
-            if (challenge.getUpdatedAt().isBefore(LocalDateTime.now()) && challenge.getIsActive()) {
-                challenge.setIsActive(false);
-                log.info("jqkleqjfljflkajfdf");
-
-            }
-            challengeRepository.save(challenge);
-        });
-
+                        challenge.setIsActive(false);
+                        challengeRepository.save(challenge);
+                        log.info(" Challenge 자동 비활성화: {} ", challenge.getChallengeId());
+                    }
+                } catch (Exception e) {
+                    log.error(" Challenge {} 처리 중 오류 : {}", challenge.getChallengeId(), e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            log.error("autoCloseChallenge 스케줄러 실행 중 오류: {}", e.getMessage());
+        }
 
     }
 
