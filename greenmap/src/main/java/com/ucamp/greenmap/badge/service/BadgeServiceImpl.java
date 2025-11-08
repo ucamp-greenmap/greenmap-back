@@ -85,11 +85,21 @@ public class BadgeServiceImpl implements BadgeService {
 
     @Override
     public String addBadge(BadgeRequest request) {
-        // 카테고리 및 이미지 조회
-        Category category = categoryRepository.findById(request.getCategoryId()).orElseThrow(() ->
-                new IllegalStateException("해당 카테고리가 DB에 없습니다."));
-        Image image = imageRepository.findByImageUrl(request.getImage_url()).orElseThrow(() ->
-                new IllegalStateException("이미지 정보가 존재하지 않습니다."));
+        // 카테고리 조회
+        Category category = categoryRepository.findByCategoryName(switch (request.getDescription().split(" ")[0]) {
+            case "따릉이" -> CategoryName.BIKE;
+            case "전기차" -> CategoryName.EVCAR;
+            case "수소차" -> CategoryName.HCAR;
+            case "재활용센터" -> CategoryName.RECYCLING_CENTER;
+            case "제로웨이스트" -> CategoryName.ZERO_WASTE;
+            default -> throw new IllegalArgumentException("유효하지 않은 카테고리입니다.");
+        }).orElseThrow(() -> new IllegalStateException("해당 카테고리가 DB에 없습니다."));
+
+        // 이미지 저장
+        Image image = Image.builder()
+                .imageUrl(request.getImage_url())
+                .build();
+        imageRepository.save(image);
 
         // 뱃지 엔티티 생성 및 저장
         Badge badge = Badge.builder()
