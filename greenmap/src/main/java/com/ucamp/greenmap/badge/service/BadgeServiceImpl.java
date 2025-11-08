@@ -11,6 +11,8 @@ import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
 import com.ucamp.greenmap.image.domain.Image;
 import com.ucamp.greenmap.image.repository.ImageRepository;
+import com.ucamp.greenmap.member.domain.Member;
+import com.ucamp.greenmap.member.repository.MemberRepository;
 import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import jakarta.transaction.Transactional;
@@ -31,6 +33,7 @@ public class BadgeServiceImpl implements BadgeService {
     private final PointRepository pointRepository;
     private final CategoryRepository categoryRepository;
     private final ImageRepository imageRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public BadgeResponse searchBadges(Long memberId) {
@@ -114,6 +117,18 @@ public class BadgeServiceImpl implements BadgeService {
                 .build();
         badge.setCreatedAt();
         badgeRepository.save(badge);
+
+        // 모든 멤버에 대해서 새 뱃지에 대한 멤버뱃지 추가
+        List<Member> members = memberRepository.findAll();
+        for (Member member : members) {
+            memberBadgeRepository.save(MemberBadge.builder()
+                    .badge(badge)
+                    .member(member)
+                    .progress(0L)
+                    .isSelected(false)
+                    .build()
+            );
+        }
 
         // 성공 응답 반환
         return "뱃지 추가 성공";
