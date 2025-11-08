@@ -1,5 +1,6 @@
 package com.ucamp.greenmap.point.service;
 
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
@@ -21,6 +22,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,6 +38,7 @@ public class PointServiceImpl implements PointService {
     private final PointHistoryRepository pointHistoryRepository;
     private final HistoryRepository historyRepository;
     private final ImageRepository imageRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
 
     @Override
     @Transactional
@@ -149,7 +152,21 @@ public class PointServiceImpl implements PointService {
         Point memberPoint = pointRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
 
-        List<Point> topRanks = pointRepository.findTop10ByOrderByPointDesc();
+        List<Point> topRanks = pointRepository.findTop10ByOrderByMonthPointDesc();
+        long myRank = pointRepository.countByMonthPointGreaterThan(memberPoint.getMonthPoint()) + 1;
+
+        List<Long> memberIds = topRanks.stream()
+                .map(p -> p.getMember().getMemberId())
+                .toList();
+
+        Map<Long, String> badgeUrlMap = memberIds.isEmpty()
+                ? Collections.emptyMap()
+                : memberBadgeRepository.findSelectedBadges(memberIds).stream()
+                .collect(Collectors.toMap(
+                        mb -> mb.getMember().getMemberId(),
+                        mb -> mb.getBadge().getImage() != null ? mb.getBadge().getImage().getImageUrl() : null,
+                        (prev, curr) -> prev
+                ));
 
         List<Ranking> ranks = topRanks.stream()
                 .map(point -> Ranking.builder()
@@ -158,6 +175,7 @@ public class PointServiceImpl implements PointService {
                         .point(point.getMonthPoint())
                         .carbonSave(point.getCarbonSaveTotal())
                         .imageUrl(point.getMember().getImage().getImageUrl())
+                        .badgeUrl(badgeUrlMap.getOrDefault(point.getMember().getMemberId(), null))
                         .build())
                 .toList();
 
@@ -168,7 +186,7 @@ public class PointServiceImpl implements PointService {
                 .memberPoint(memberPoint.getMonthPoint())
                 .carbonSave(memberPoint.getCarbonSaveTotal())
                 .imageUrl(memberPoint.getMember().getImage().getImageUrl())
-                .rank(pointRepository.countByPointGreaterThan(memberPoint.getPoint()) + 1)
+                .rank(myRank)
                 .ranks(ranks)
                 .build();
     }
