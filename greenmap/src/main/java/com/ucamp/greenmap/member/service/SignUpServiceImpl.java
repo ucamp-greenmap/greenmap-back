@@ -3,6 +3,7 @@ package com.ucamp.greenmap.member.service;
 import com.ucamp.greenmap.Kakao.JwtTokenProvider;
 import com.ucamp.greenmap.badge.domain.Badge;
 import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.BadgeRepository;
 import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.common.repository.CategoryRepository;
 import com.ucamp.greenmap.image.domain.Image;
@@ -21,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class SignUpServiceImpl implements SignUpService {
     private final MemberBadgeRepository memberBadgeRepository;
     private final CategoryRepository categoryRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BadgeRepository badgeRepository;
 
     @Override
     public SignUpResponse signup(SignUpRequest request) {
@@ -84,11 +88,20 @@ public class SignUpServiceImpl implements SignUpService {
         pointRepository.save(point);
 
         //  기본 배지 지급
-        MemberBadge memberBadge = MemberBadge.builder()
-                .member(member)
-                .badge(Badge.builder().badgeId(1L).build())
-                .build();
-        memberBadgeRepository.save(memberBadge);
+        List<Badge> allBadges = badgeRepository.findAll();
+        List<MemberBadge> memberBadges = new ArrayList<>();
+
+        for (Badge badge : allBadges) {
+            MemberBadge mb = MemberBadge.builder()
+                    .member(saved)
+                    .badge(badge)
+                    .progress(0L)
+                    .isSelected(false)
+                    .build();
+            memberBadges.add(mb);
+        }
+
+        memberBadgeRepository.saveAll(memberBadges);
 
         //  JWT 발급
         String token = jwtTokenProvider.accessTokenGenerate(member.getMemberId(),
