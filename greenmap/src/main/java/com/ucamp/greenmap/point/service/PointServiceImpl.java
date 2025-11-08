@@ -309,4 +309,22 @@ public class PointServiceImpl implements PointService {
                 .popular(voucher.getPopular())
                 .build();
     }
+
+    @Override
+    public MyRankingResponse getMyRanking(Long memberId) {
+        Point memberPoint = pointRepository.findByMember_MemberId(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
+
+        long myRank = pointRepository.countByMonthPointGreaterThan(memberPoint.getMonthPoint()) + 1;
+
+        return MyRankingResponse.builder()
+                .memberId(memberId)
+                .nickname(memberPoint.getMember().getNickname())
+                .memberPoint(memberPoint.getMonthPoint())
+                .carbonSave(memberPoint.getCarbonSaveTotal())
+                .imageUrl(memberPoint.getMember().getImage().getImageUrl())
+                .rank(myRank)
+                .build();
+    }
+
 }

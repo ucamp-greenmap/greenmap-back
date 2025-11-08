@@ -22,4 +22,6 @@ public interface PointService {
     CarbonInfoResponse getCarbonInfo(Long memberId);
 
     ShopAddResponse addShopVoucher(ShopRequest request, Long memberId);
+
+    MyRankingResponse getMyRanking(Long memberId);
 }
