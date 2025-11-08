@@ -14,6 +14,7 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     boolean existsByEmail(@Param("email") String email);
 
     // 닉네임 중복확인
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM Member m WHERE m.nickname = :nickname AND m.isActive = true")
     boolean existsByNickname(String nickname);
 
     // 이메일로 유저 조회
