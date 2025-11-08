@@ -23,7 +23,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private  final ImageRepository imageRepository;
 
-    //내 정보 조회 (JWT email 기반)
+    //내 정보 조회
     public MemberResponse getMyInfo(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
