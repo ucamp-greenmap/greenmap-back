@@ -1,8 +1,10 @@
 package com.ucamp.greenmap.member.service;
 
+import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.dto.response.MyPageResponse;
 import com.ucamp.greenmap.member.dto.response.RecodeResponse;
+import com.ucamp.greenmap.member.repository.MemberRepository;
 import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.dto.response.MyRankingResponse;
 import com.ucamp.greenmap.point.dto.response.RankingResponse;
@@ -22,13 +24,13 @@ public class MyPageServiceImpl implements MyPageService {
     private final HistoryRepository historyRepository;
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
-    private final PointService pointService;
 
     @Override
     public MyPageResponse getMyPage(Long memberId) {
         MemberResponse member = memberService.getMyInfo(memberId);
-        UserInfoResponse point = pointService.getPointInfo(memberId);
-        MyRankingResponse ranking = pointService.getMyRanking(memberId);
+        Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(
+                () -> new IllegalArgumentException("해당 멤버의 포인트 정보가 없습니다."));
+        long rank = pointRepository.countByMonthPointGreaterThan(point.getMonthPoint()) + 1;
 
         return MyPageResponse.builder()
                 .member(
@@ -42,14 +44,14 @@ public class MyPageServiceImpl implements MyPageService {
                 .point(
                         MyPageResponse.PointInfo.builder()
                                 .point(point.getPoint())
-                                .carbonSave(point.getCarbon_save())
+                                .carbonSave(point.getCarbonSaveTotal())
                                 .build()
                 )
                 .ranking(
                         MyPageResponse.RankingInfo.builder()
-                                .rank(ranking.getRank())
-                                .point(ranking.getMemberPoint())
-                                .carbonSave(ranking.getCarbonSave())
+                                .rank(rank)
+                                .point(point.getMonthPoint())
+                                .carbonSave(point.getCarbonSaveTotal())
                                 .build()
                 )
                 .build();
