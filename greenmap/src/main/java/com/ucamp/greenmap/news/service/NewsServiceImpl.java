@@ -186,14 +186,23 @@ public class NewsServiceImpl implements NewsService {
         point.addPoint(5L);
 
         // 뱃지 최신화
-        MemberBadge memberBadge = memberBadgeRepository.findByMember_MemberId(memberRef.getMemberId()).orElseThrow(
-                () -> new IllegalStateException("멤버 뱃지 정보가 존재하지 않습니다."));
-        Badge nextBadge = badgeRepository.findById(
-                memberBadge.getBadge().getBadgeId() != 5 ?
-                        memberBadge.getBadge().getBadgeId() + 1 : 5
-        ).orElseThrow(() -> new IllegalStateException("다음 뱃지 정보가 존재하지 않습니다."));
-        if (point.getWholePoint() >= nextBadge.getRequirement() && memberBadge.getBadge().getBadgeId() != 5) {
-            memberBadge.updateBadge(nextBadge);
+        // 멤버뱃지 조회
+        List<MemberBadge> memberBadges = memberBadgeRepository.findByMember_MemberId(memberId);
+        // 멤버뱃지 중 포인트 뱃지 진행도 업데이트
+        for (MemberBadge memberBadge : memberBadges) {
+            Badge badge = memberBadge.getBadge();
+            Long requirement = badge.getRequirement();
+            Long progress = memberBadge.getProgress();
+
+            // 포인트 뱃지 진행도 업데이트
+            if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
+                progress += 5;
+                if (progress >= requirement) {
+                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
+                    memberBadge.setIsActive(false);
+                }
+                memberBadge.addBadgeProgress(progress);
+            }
         }
 
         // 성공 응답 반환

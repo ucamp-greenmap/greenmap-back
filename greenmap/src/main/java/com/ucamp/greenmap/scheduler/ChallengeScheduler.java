@@ -22,13 +22,13 @@ public class ChallengeScheduler {
     private final MemberChallengeRepository memberChallengeRepository;
     private final ChallengeRepository challengeRepository;
 
-    // 매일 자정 실행
     @Scheduled(cron = "0 0 */6 * * *")
     public void autoCloseChallenges() {
         memberRepository.findAll().forEach(
                 member -> memberChallengeRepository.updateExpiredChallenges()
         );
     }
+
 
     @Scheduled(cron = "* * */12 * * *")
     @Transactional

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @NoArgsConstructor
@@ -30,8 +31,28 @@ public class MemberBadge extends BaseEntity {
     @JoinColumn(name = "badge_id")
     private Badge badge;
 
+    private Boolean isSelected = false;
+    @Column(name = "badge_progress")
+    private Long progress;
+
     public void updateBadge(Badge badge) {
         this.badge = badge;
+        this.updatedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
+
+    public void addBadgeProgress(Long progress) {
+        this.progress = progress;
+    }
+
+    public void selectBadge() {
+        this.isSelected = true;
         this.updatedAt = LocalDateTime.now();
+    }
+
+    public void deselectBadge() {
+        if (this.isSelected) {
+            this.isSelected = false;
+            this.updatedAt = LocalDateTime.now();
+        }
     }
 }

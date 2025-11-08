@@ -11,4 +11,5 @@ public class Ranking {
     private Long point;
     private Long carbonSave;
     private String imageUrl;
+    private String badgeUrl;
 }
