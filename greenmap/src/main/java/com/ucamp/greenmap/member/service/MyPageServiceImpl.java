@@ -45,7 +45,7 @@ public class MyPageServiceImpl implements MyPageService {
                                 .email(member.getEmail())
                                 .nickname(member.getNickname())
                                 .imageUrl(member.getImage().getImageUrl())
-                                .badgeName(memberBadge.getBadge().getBadgeName())
+                                .badgeUrl(memberBadge.getBadge().getImage().getImageUrl())
                                 .build()
                 )
                 .point(

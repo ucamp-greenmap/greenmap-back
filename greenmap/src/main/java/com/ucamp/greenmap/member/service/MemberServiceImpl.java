@@ -1,6 +1,8 @@
 package com.ucamp.greenmap.member.service;
 
 import com.nimbusds.jwt.JWT;
+import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.image.domain.Image;
 import com.ucamp.greenmap.image.dto.response.ImageResponse;
 import com.ucamp.greenmap.image.repository.ImageRepository;
@@ -22,13 +24,19 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private  final ImageRepository imageRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
 
     //내 정보 조회
     public MemberResponse getMyInfo(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("USER NOT FOUND"));
 
-        return MemberResponse.memberResponse(member);
+        MemberResponse mr =  MemberResponse.memberResponse(member);
+        MemberBadge mb = memberBadgeRepository.findSelectedBadge(memberId)
+                .orElseThrow(() -> new RuntimeException("SELECTED BADGE NOT FOUND"));
+        mr.setBadgeUrl(mb.getBadge().getImage().getImageUrl());
+
+        return mr;
 
     }
 
