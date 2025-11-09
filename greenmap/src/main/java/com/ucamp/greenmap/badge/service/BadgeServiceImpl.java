@@ -30,7 +30,6 @@ import java.util.List;
 public class BadgeServiceImpl implements BadgeService {
     private final MemberBadgeRepository memberBadgeRepository;
     private final BadgeRepository badgeRepository;
-    private final PointRepository pointRepository;
     private final CategoryRepository categoryRepository;
     private final ImageRepository imageRepository;
     private final MemberRepository memberRepository;
@@ -75,7 +74,7 @@ public class BadgeServiceImpl implements BadgeService {
                     .standard(standard)
                     .description(description)
                     .image_url(imageUrl)
-                    .created_at(badge.getCreatedAt())
+                    .created_at(createdAt)
                     .isAcquired(isAcquired)
                     .isSelected(isSelected)
                     .build();
