@@ -18,7 +18,7 @@ public class MyPageResponse {
         private String email;
         private String nickname;
         private String imageUrl;
-        private String badgeName;
+        private String badgeUrl;
     }
 
     @Getter

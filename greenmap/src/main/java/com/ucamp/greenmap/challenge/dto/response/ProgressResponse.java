@@ -12,6 +12,6 @@ public class ProgressResponse {
     private Long memberChallengeId;
     private Long memberId;
     private Long challengeId;
-    private Long progress;
+    private Double progress;
     private Boolean isActive;
 }

@@ -15,7 +15,7 @@ public class ChallengeDetail {
     private String challengeName;
     private String description;
     private Long pointAmount;
-    private Long progress;
+    private Double progress;
     private LocalDateTime createdAt;
     private Long memberId;
     private Long deadline;

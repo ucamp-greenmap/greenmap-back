@@ -142,7 +142,7 @@ public class BadgeServiceImpl implements BadgeService {
         // 획득한 뱃지인지 검증
         for (MemberBadge mb : badgeList) {
             if (mb.getBadge().getBadgeName().equals(badgeName)) {
-                if (mb.getBadge().getIsActive()) {
+                if (mb.getIsActive()) {
                     return "획득하지 못한 뱃지입니다.";
                 } else {
                     break;
@@ -153,6 +153,7 @@ public class BadgeServiceImpl implements BadgeService {
         // 뱃지 선택 및 나머지 뱃지 선택 해제
         for (MemberBadge mb : badgeList) {
             if (mb.getBadge().getBadgeName().equals(badgeName)) {
+                log.info("해당 이름의 뱃지를 선택");
                 mb.selectBadge();
             } else {
                 mb.deselectBadge();
