@@ -45,7 +45,7 @@ public class BadgeServiceImpl implements BadgeService {
         List<BadgeResponse.BadgeInfo> badgeInfos = badges.stream().map(badge -> {
             // 기본 뱃지 정보 추출
             String name = badge.getBadgeName();
-            Long progress = null;
+            Long progress = 0L;
             Long standard = badge.getRequirement();
             String description = badge.getDescription();
             String imageUrl = badge.getImage().getImageUrl();
@@ -138,6 +138,17 @@ public class BadgeServiceImpl implements BadgeService {
     public String selectBadges(Long memberId, String badgeName) {
         // 멤버의 뱃지 목록 조회
         List<MemberBadge> badgeList = memberBadgeRepository.findByMember_MemberId(memberId);
+
+        // 획득한 뱃지인지 검증
+        for (MemberBadge mb : badgeList) {
+            if (mb.getBadge().getBadgeName().equals(badgeName)) {
+                if (mb.getBadge().getIsActive()) {
+                    return "획득하지 못한 뱃지입니다.";
+                } else {
+                    break;
+                }
+            }
+        }
 
         // 뱃지 선택 및 나머지 뱃지 선택 해제
         for (MemberBadge mb : badgeList) {
