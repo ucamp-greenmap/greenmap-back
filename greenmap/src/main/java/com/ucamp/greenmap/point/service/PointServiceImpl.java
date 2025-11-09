@@ -1,5 +1,6 @@
 package com.ucamp.greenmap.point.service;
 
+import com.ucamp.greenmap.badge.domain.MemberBadge;
 import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.common.domain.Category;
 import com.ucamp.greenmap.common.domain.CategoryName;
@@ -105,9 +106,14 @@ public class PointServiceImpl implements PointService {
     public UserInfoResponse getPointInfo(Long memberId) {
         Point point = pointRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
+
+        MemberBadge mb = memberBadgeRepository.findSelectedBadge(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원의 선택된 배지 정보가 없습니다."));
+
         return UserInfoResponse.builder()
                 .carbon_save(point.getCarbonSaveTotal())
                 .point(point.getPoint())
+                .badgeUrl(mb.getBadge().getImage().getImageUrl())
                 .build();
     }
 

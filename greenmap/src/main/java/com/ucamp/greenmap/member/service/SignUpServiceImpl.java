@@ -99,6 +99,7 @@ public class SignUpServiceImpl implements SignUpService {
                     .build();
             if (badge.getBadgeId() == 1L) { // 최초 가입 배지
                 mb.setIsActive(false);
+                mb.setIsSelected(true);
             }
             memberBadges.add(mb);
         }
