@@ -102,10 +102,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                         .build();
                 memberBadges.add(mb);
             }
-
             memberBadgeRepository.saveAll(memberBadges);
 
-            memberBadgeRepository.saveAll(memberBadges);
 
         } else {
             Image img = user.getImage();

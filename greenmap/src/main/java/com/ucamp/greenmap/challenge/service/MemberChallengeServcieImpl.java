@@ -60,9 +60,19 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .challenge(challenge)
                 .progress(0L)
                 .build();
+        Challenge saveChallenge = Challenge.builder()
+                .challengeId(challenge.getChallengeId())
+                .challengeName(challenge.getChallengeName())
+                .success(challenge.getSuccess())
+                .deadline(challenge.getDeadline())
+                .description(challenge.getDescription())
+                .pointAmount(challenge.getPointAmount())
+                .memberCount(challenge.getMemberCount()+1)
+                        .build();
 
         // 4. 저장
         memberChallengeRepository.save(memberChallenge);
+        challengeRepository.save(saveChallenge);
 
         // 5. DTO로 변환하여 리턴
         return MemberChallengeregis.builder()
