@@ -106,6 +106,11 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
         for (MemberChallenge memberChallenge : attendChallenges) {
             Challenge challenge = memberChallenge.getChallenge();
 
+            Double progress = (double) memberChallenge.getProgress();
+            if (challenge.getDescription().startsWith("따릉이")) {
+                progress = (double) memberChallenge.getProgress() / 1000;
+            }
+
             // DTO에 넣기
             ChallengeDetail attendChallengeDetail = ChallengeDetail.builder()
                     .memberChallengeId(memberChallenge.getMemberChallengeId())
@@ -113,7 +118,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                     .challengeName(challenge.getChallengeName())
                     .description(challenge.getDescription())
                     .pointAmount(challenge.getPointAmount())
-                    .progress(memberChallenge.getProgress())
+                    .progress(progress)
                     .createdAt(memberChallenge.getCreatedAt())
                     .deadline(challenge.getDeadline())
                     .memberCount(challenge.getMemberCount())
@@ -147,13 +152,18 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
         for (MemberChallenge memberChallenge : endChallenges) {
             Challenge challenge = memberChallenge.getChallenge();
 
+            Double progress = (double) memberChallenge.getProgress();
+            if (challenge.getDescription().startsWith("따릉이")) {
+                progress = (double) memberChallenge.getProgress() / 1000;
+            }
+
             // DTO에 넣기
             ChallengeDetail endChallengeDetail = ChallengeDetail.builder()
                     .challengeId(challenge.getChallengeId())
                     .challengeName(challenge.getChallengeName())
                     .description(challenge.getDescription())
                     .pointAmount(challenge.getPointAmount())
-                    .progress(memberChallenge.getProgress())
+                    .progress(progress)
                     .createdAt(memberChallenge.getCreatedAt())
                     .deadline(challenge.getDeadline())
                     .memberCount(challenge.getMemberCount())
@@ -218,7 +228,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                     .memberChallengeId(memberChallengeId)
                     .memberId(memberId)
                     .challengeId(memberChallenge.getChallenge().getChallengeId())
-                    .progress(memberChallenge.getProgress())
+                    .progress((double) memberChallenge.getProgress())
                     .isActive(false)
                     .build();
         }
@@ -237,9 +247,6 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
 
         // 따릉이 챌린지면 km → m 단위 변환하여 저장
         boolean isBikeChallenge = description != null && description.startsWith("따릉이");
-        if (isBikeChallenge) {
-            increaseProgress = times * 1000;
-        }
 
         // progress 누적
         Long newProgress = memberChallenge.getProgress() + increaseProgress;
@@ -308,7 +315,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .memberChallengeId(updated.getMemberChallengeId())
                 .memberId(updated.getMember().getMemberId())
                 .challengeId(updated.getChallenge().getChallengeId())
-                .progress(updated.getProgress())
+                .progress((double) updated.getProgress() / 1000)
                 .isActive(updated.getIsActive())
                 .build();
     }
