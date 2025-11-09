@@ -3,15 +3,13 @@ package com.ucamp.greenmap.badge.domain;
 import com.ucamp.greenmap.common.domain.BaseEntity;
 import com.ucamp.greenmap.member.domain.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

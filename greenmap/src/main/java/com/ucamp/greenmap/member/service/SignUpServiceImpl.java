@@ -15,7 +15,6 @@ import com.ucamp.greenmap.member.dto.request.SignUpRequest;
 import com.ucamp.greenmap.member.dto.response.BasicLoginResponse;
 import com.ucamp.greenmap.member.dto.response.SignUpResponse;
 import com.ucamp.greenmap.member.repository.MemberRepository;
-import com.ucamp.greenmap.member.service.SignUpService;
 import com.ucamp.greenmap.point.domain.Point;
 import com.ucamp.greenmap.point.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
@@ -98,6 +97,9 @@ public class SignUpServiceImpl implements SignUpService {
                     .progress(0L)
                     .isSelected(false)
                     .build();
+            if (badge.getBadgeId() == 1L) { // 최초 가입 배지
+                mb.setIsActive(false);
+            }
             memberBadges.add(mb);
         }
 
