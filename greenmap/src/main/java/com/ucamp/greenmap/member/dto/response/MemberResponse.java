@@ -2,21 +2,20 @@ package com.ucamp.greenmap.member.dto.response;
 
 import com.ucamp.greenmap.image.dto.response.ImageResponse;
 import com.ucamp.greenmap.member.domain.Member;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
 public class MemberResponse {
     private Long memberId;
     private String email;
     private String nickname;
     private Boolean isActive;
     private ImageResponse image;
+    private String badgeUrl;
 
     public static MemberResponse memberResponse(Member member) {
 
