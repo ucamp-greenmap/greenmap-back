@@ -16,6 +16,7 @@ public class Image {
     @Column(name = "image_id")
     private Long imageId;
 
+    @Column(length = 1000)
     private String imageUrl;
 
     public Image(String imageUrl) {
