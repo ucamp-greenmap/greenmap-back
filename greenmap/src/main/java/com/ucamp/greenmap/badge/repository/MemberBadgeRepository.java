@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberBadgeRepository extends JpaRepository<MemberBadge, Long> {
     List<MemberBadge> findByMember_MemberId(Long memberId);
@@ -19,4 +20,14 @@ public interface MemberBadgeRepository extends JpaRepository<MemberBadge, Long> 
              AND mb.isSelected = true
            """)
     List<MemberBadge> findSelectedBadges(@Param("memberIds") List<Long> memberIds);
+
+    @Query("""
+           SELECT mb
+           FROM MemberBadge mb
+           JOIN FETCH mb.badge b
+           JOIN FETCH b.image img
+           WHERE mb.member.memberId = :memberId
+             AND mb.isSelected = true
+           """)
+    Optional<MemberBadge> findSelectedBadge(Long memberId);
 }

@@ -1,5 +1,7 @@
 package com.ucamp.greenmap.member.service;
 
+import com.ucamp.greenmap.badge.domain.MemberBadge;
+import com.ucamp.greenmap.badge.repository.MemberBadgeRepository;
 import com.ucamp.greenmap.member.domain.Member;
 import com.ucamp.greenmap.member.dto.response.MemberResponse;
 import com.ucamp.greenmap.member.dto.response.MyPageResponse;
@@ -24,6 +26,7 @@ public class MyPageServiceImpl implements MyPageService {
     private final HistoryRepository historyRepository;
     private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
+    private final MemberBadgeRepository memberBadgeRepository;
 
     @Override
     public MyPageResponse getMyPage(Long memberId) {
@@ -32,6 +35,9 @@ public class MyPageServiceImpl implements MyPageService {
                 () -> new IllegalArgumentException("해당 멤버의 포인트 정보가 없습니다."));
         long rank = pointRepository.countByMonthPointGreaterThan(point.getMonthPoint()) + 1;
 
+        MemberBadge memberBadge = memberBadgeRepository.findSelectedBadge(memberId).orElseThrow(
+                () -> new IllegalArgumentException("해당 멤버가 선택한 뱃지가 없습니다."));
+
         return MyPageResponse.builder()
                 .member(
                         MyPageResponse.MemberInfo.builder()
@@ -39,6 +45,7 @@ public class MyPageServiceImpl implements MyPageService {
                                 .email(member.getEmail())
                                 .nickname(member.getNickname())
                                 .imageUrl(member.getImage().getImageUrl())
+                                .badgeName(memberBadge.getBadge().getBadgeName())
                                 .build()
                 )
                 .point(
