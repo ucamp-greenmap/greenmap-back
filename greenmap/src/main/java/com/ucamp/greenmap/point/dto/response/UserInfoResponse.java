@@ -8,4 +8,5 @@ import lombok.Getter;
 public class UserInfoResponse {
     private Long carbon_save;
     private Long point;
+    private String badgeUrl;
 }
