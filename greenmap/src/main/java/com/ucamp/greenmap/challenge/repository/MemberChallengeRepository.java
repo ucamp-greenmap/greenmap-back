@@ -47,8 +47,5 @@ SELECT mc.*
     );
 
 
-
-
-
-
+    MemberChallenge findChallengeByMember_memberIdAndChallenge_challengeId(Long memberId, Long challengeId);
 }
