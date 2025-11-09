@@ -50,6 +50,10 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
         Challenge challenge = challengeRepository.findById(challengeId)
                 .orElseThrow(() -> new RuntimeException("CHALLENGE NOT FOUND"));
 
+        MemberChallenge mc = memberChallengeRepository.findChallengeByMember_memberIdAndChallenge_challengeId(memberId, challengeId);
+        if (mc != null) {
+            return null;
+        }
         // 3. 참여 엔티티 생성
         MemberChallenge memberChallenge = MemberChallenge.builder()
                 .member(member)
