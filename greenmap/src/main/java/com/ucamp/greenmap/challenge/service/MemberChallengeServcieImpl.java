@@ -308,8 +308,8 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
                     progress += rewardPoint;
                     if (progress >= requirement) {
-                        // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                        memberBadge.setIsActive(false);
+                        // 뱃지 획득
+                        memberBadge.acquireBadge();
                     }
                     memberBadge.addBadgeProgress(progress);
                 }

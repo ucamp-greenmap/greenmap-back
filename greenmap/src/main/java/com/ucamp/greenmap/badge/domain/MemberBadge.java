@@ -42,6 +42,11 @@ public class MemberBadge extends BaseEntity {
         this.progress = progress;
     }
 
+    public void acquireBadge() {
+        this.setIsActive(false);
+        this.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")));
+    }
+
     public void selectBadge() {
         this.isSelected = true;
         this.updatedAt = LocalDateTime.now();

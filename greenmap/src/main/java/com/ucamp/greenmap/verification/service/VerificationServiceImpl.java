@@ -32,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -126,8 +128,8 @@ public class VerificationServiceImpl implements VerificationService{
                 progress += (long) (bikeRequest.getDistance() * 1000);
                 // 기준을 넘으면 뱃지 획득 처리
                 if (progress >= requirement) {
-                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                    memberBadge.setIsActive(false);
+                    // 뱃지 획득
+                    memberBadge.acquireBadge();
                 }
                 memberBadge.addBadgeProgress(progress);
             }
@@ -136,8 +138,8 @@ public class VerificationServiceImpl implements VerificationService{
             if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
                 progress += pointAmount;
                 if (progress >= requirement) {
-                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                    memberBadge.setIsActive(false);
+                    // 뱃지 획득
+                    memberBadge.acquireBadge();
                 }
                 memberBadge.addBadgeProgress(progress);
             }
@@ -252,8 +254,8 @@ public class VerificationServiceImpl implements VerificationService{
                 progress += (long) (carRequest.getChargeAmount());
                 // 기준을 넘으면 뱃지 획득 처리
                 if (progress >= requirement) {
-                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                    memberBadge.setIsActive(false);
+                    // 뱃지 획득
+                    memberBadge.acquireBadge();
                 }
                 memberBadge.addBadgeProgress(progress);
             }
@@ -262,8 +264,8 @@ public class VerificationServiceImpl implements VerificationService{
             if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
                 progress += pointAmount;
                 if (progress >= requirement) {
-                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                    memberBadge.setIsActive(false);
+                    // 뱃지 획득
+                    memberBadge.acquireBadge();
                 }
                 memberBadge.addBadgeProgress(progress);
             }
@@ -378,8 +380,8 @@ public class VerificationServiceImpl implements VerificationService{
                 progress += (long) (shopRequest.getPrice());
                 // 기준을 넘으면 뱃지 획득 처리
                 if (progress >= requirement) {
-                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                    memberBadge.setIsActive(false);
+                    // 뱃지 획득
+                    memberBadge.acquireBadge();
                 }
                 memberBadge.addBadgeProgress(progress);
             }
@@ -388,8 +390,8 @@ public class VerificationServiceImpl implements VerificationService{
             if (memberBadge.getIsActive() && badge.getCategory().getCategoryName() == CategoryName.BADGE) {
                 progress += pointAmount;
                 if (progress >= requirement) {
-                    // 뱃지 획득 -> isActive false가 획득했다는 뜻
-                    memberBadge.setIsActive(false);
+                    // 뱃지 획득
+                    memberBadge.acquireBadge();
                 }
                 memberBadge.addBadgeProgress(progress);
             }
