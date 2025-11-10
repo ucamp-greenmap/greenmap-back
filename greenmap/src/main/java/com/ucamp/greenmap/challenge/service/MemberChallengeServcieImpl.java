@@ -60,6 +60,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .challenge(challenge)
                 .progress(0L)
                 .build();
+        memberChallenge.setCreatedAt();
         Challenge saveChallenge = Challenge.builder()
                 .challengeId(challenge.getChallengeId())
                 .challengeName(challenge.getChallengeName())
