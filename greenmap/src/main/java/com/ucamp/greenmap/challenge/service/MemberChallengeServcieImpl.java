@@ -69,6 +69,8 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .pointAmount(challenge.getPointAmount())
                 .memberCount(challenge.getMemberCount()+1)
                         .build();
+        saveChallenge.setCreatedAt(memberChallenge.getChallenge().getCreatedAt());
+        saveChallenge.setUpdatedAt(memberChallenge.getChallenge().getUpdatedAt());
 
         // 4. 저장
         memberChallengeRepository.save(memberChallenge);
