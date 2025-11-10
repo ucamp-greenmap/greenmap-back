@@ -158,8 +158,9 @@ public class PointServiceImpl implements PointService {
         Point memberPoint = pointRepository.findByMember_MemberId(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원의 포인트 정보가 없습니다."));
 
-        List<Point> topRanks = pointRepository.findTop10ByOrderByMonthPointDesc();
-        long myRank = pointRepository.countByMonthPointGreaterThan(memberPoint.getMonthPoint()) + 1;
+        List<Point> topRanks = pointRepository.findTop10ByMember_IsActiveTrueOrderByMonthPointDesc();
+
+        long myRank = pointRepository.countByMonthPointGreaterThanAndMember_IsActiveTrue(memberPoint.getMonthPoint()) + 1;
 
         List<Long> memberIds = topRanks.stream()
                 .map(p -> p.getMember().getMemberId())
