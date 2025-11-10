@@ -27,7 +27,7 @@ public interface MemberChallengeRepository extends JpaRepository<MemberChallenge
     UPDATE member_challenge mc
     JOIN challenge c ON mc.challenge_id = c.challenge_id
     SET mc.is_active = false
-      AND DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
+      WHERE DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
 """, nativeQuery = true)
     void updateExpiredChallenges();
 
@@ -35,7 +35,7 @@ public interface MemberChallengeRepository extends JpaRepository<MemberChallenge
 SELECT mc.*
     FROM member_challenge mc
     JOIN challenge c ON mc.challenge_id = c.challenge_id
-      AND DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
+      WHERE DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) < CURRENT_DATE()
     ORDER BY DATE_ADD(mc.created_at, INTERVAL c.deadline DAY) DESC
 """, nativeQuery = true)
     List<MemberChallenge> findExpiredChallenges();
