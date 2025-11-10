@@ -15,7 +15,9 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
     Optional<Point> findByMember_MemberId(Long memberId);
 
-    List<Point> findTop10ByOrderByMonthPointDesc();
+    List<Point> findTop10ByMember_IsActiveTrueOrderByMonthPointDesc();
 
     long countByMonthPointGreaterThan(Long monthPoint);
+
+    long countByMonthPointGreaterThanAndMember_IsActiveTrue(Long monthPoint);
 }
