@@ -17,8 +17,16 @@ public interface MemberChallengeRepository extends JpaRepository<MemberChallenge
             "WHERE mc.member.memberId = :memberId AND mc.isActive = true")
     List<MemberChallenge> findAttendChallengesByMemberId(Long memberId);
 
-    @Query("SELECT mc FROM MemberChallenge mc WHERE mc.member.memberId = :memberId AND mc.isActive = false AND mc.progress = 100")
-    List<MemberChallenge> findEndChallengesByMemberId(Long memberId);
+    @Query("""
+        SELECT mc 
+        FROM MemberChallenge mc
+        JOIN mc.challenge c
+        WHERE mc.member.memberId = :memberId
+          AND mc.isActive = false
+          AND mc.progress >= c.success
+    """)
+    List<MemberChallenge> findCompletedChallengesByMemberId(Long memberId);
+
 
 
     @Transactional
