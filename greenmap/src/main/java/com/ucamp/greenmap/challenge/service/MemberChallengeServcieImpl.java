@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
                 .challenge(challenge)
                 .progress(0L)
                 .build();
-        memberChallenge.setCreatedAt();
+        memberChallenge.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(9));
         Challenge saveChallenge = Challenge.builder()
                 .challengeId(challenge.getChallengeId())
                 .challengeName(challenge.getChallengeName())
