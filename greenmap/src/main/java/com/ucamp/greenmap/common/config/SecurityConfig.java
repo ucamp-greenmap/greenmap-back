@@ -1,5 +1,6 @@
 package com.ucamp.greenmap.common.config;
 
+import com.ucamp.greenmap.Kakao.CustomOAuth2UserService;
 import com.ucamp.greenmap.Kakao.JwtAuthenticationFilter;
 import com.ucamp.greenmap.Kakao.OAuth2FailureHandler;
 import com.ucamp.greenmap.Kakao.OAuth2SuccessHandler;
@@ -20,65 +21,67 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
 
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http
-                            .csrf(csrf -> csrf.disable())
-                            .cors(cors -> {})
-                            .formLogin(form -> form.disable())
-                            .httpBasic(basic -> basic.disable())
+        http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {
+                })
+                .formLogin(form -> form.disable())
+                .httpBasic(basic -> basic.disable())
 
-                            .sessionManagement(session -> session.sessionFixation().newSession())
+                .sessionManagement(session -> session.sessionFixation().newSession())
 
-                            .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
-                                                                "/",
-                                                                "/map/**",
-                                                                "/place/**",
-                                                                "/place",
-                                                                "/news/**",
-                                                                "/member",
-                                                                "/member/deactivate",
-                                                                "/admin",
-                                                                "/chalregis",
-                                                                "/member/check-email",
-                                                                "/member/check-nickname",
-                                                                "/member/me",
-                                                                "/member/login",
-                                                                "/member/findPw",
-                                                                "/member/signup",
-                                                                "/login/success",
-                                                                "/error",
-                                                                "/favicon.ico",
-                                                                "/oauth2/**",
-                                                                "/login/**",
-                                                                "/login/oauth2/**")
-                                                .permitAll()
-                                                .anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/map/**",
+                                "/place/**",
+                                "/place",
+                                "/news/**",
+                                "/member",
+                                "/member/deactivate",
+                                "/admin",
+                                "/chalregis",
+                                "/member/check-email",
+                                "/member/check-nickname",
+                                "/member/me",
+                                "/member/login",
+                                "/member/findPw",
+                                "/member/signup",
+                                "/login/success",
+                                "/error",
+                                "/favicon.ico",
+                                "/oauth2/**",
+                                "/login/**",
+                                "/login/oauth2/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
 
-                            .oauth2Login(oauth -> oauth
-                                            .authorizationEndpoint(
-                                                            endpoint -> endpoint.baseUri("/oauth2/authorization"))
-                                            .redirectionEndpoint(
-                                                            endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
-                                            .successHandler(oAuth2SuccessHandler)
-                                            .failureHandler(oAuth2FailureHandler))
+                .oauth2Login(oauth -> oauth
+                        .authorizationEndpoint(
+                                endpoint -> endpoint.baseUri("/oauth2/authorization"))
+                        .redirectionEndpoint(
+                                endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuth2SuccessHandler)
+                        .failureHandler(oAuth2FailureHandler))
 
-                            .logout(logout -> logout
-                                            .logoutUrl("/logout")
-                                            .logoutSuccessUrl(frontendUrl + "/login")
-                                            .invalidateHttpSession(true)
-                                            .clearAuthentication(true));
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl(frontendUrl + "/login")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true));
 
-            http.addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-            return http.build();
+        return http.build();
     }
 
     @Bean

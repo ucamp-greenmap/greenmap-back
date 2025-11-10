@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.mapping.Bag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,12 +25,14 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final com.ucamp.greenmap.member.repository.MemberRepository memberRepository;
     private final ImageRepository imageRepository;
     private final PointRepository pointRepository;
     private final MemberBadgeRepository memberBadgeRepository;
@@ -62,9 +65,18 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         String principal = Optional.ofNullable(email).orElse("kakao:" + kakaoId);
 
-        Member user = userRepository.findByEmail(principal).orElse(null);
+        // 카카오 ID로 먼저 조회 (더 정확함)
+        Member user = memberRepository.findByKakaoId(kakaoId).orElse(null);
+
+        // 카카오 ID로 찾지 못하면 이메일로 조회 (기존 로직 유지)
+        if (user == null) {
+            user = userRepository.findByEmail(principal).orElse(null);
+        }
 
         if (user == null) {
+            // 신규 회원가입
+            log.info("신규 카카오 회원가입 시작: kakaoId={}, email={}, nickname={}", kakaoId, principal, nickname);
+
             Image img = new Image(profileImageUrl);
             imageRepository.save(img);
 
@@ -74,8 +86,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             user.setNickname(nickname);
             user.setPassword("SOCIAL_LOGIN");
             user.setImage(img);
+            user.setIsActive(true); // 활성 상태로 설정
+            user.setCreatedAt(); // 생성 시간 설정
 
             Member saved = userRepository.save(user);
+            log.info("신규 카카오 회원가입 완료: memberId={}", saved.getMemberId());
             Point point = Point.builder()
                     .member(saved)
                     .point(0L)
@@ -88,7 +103,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                     .build();
 
             pointRepository.save(point);
-
 
             List<Badge> allBadges = badgeRepository.findAll();
             List<MemberBadge> memberBadges = new ArrayList<>();
@@ -103,7 +117,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 memberBadges.add(mb);
             }
             memberBadgeRepository.saveAll(memberBadges);
-
 
         } else {
             Image img = user.getImage();
@@ -125,7 +138,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // Frontend redirect
         if (!response.isCommitted()) {
             response.sendRedirect(frontendUrl + "/login/success?token=" + accessToken);
-            //response.sendRedirect("http://localhost:5173/login/success?token=" + accessToken);
+            // response.sendRedirect("http://localhost:5173/login/success?token=" +
+            // accessToken);
         }
     }
 }
