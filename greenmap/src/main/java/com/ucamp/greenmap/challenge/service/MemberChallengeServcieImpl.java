@@ -156,7 +156,7 @@ public class MemberChallengeServcieImpl implements MemberChallengeService {
 
         // 2. 참여완료 챌린지 조회
         List<MemberChallenge> endChallenges =
-                memberChallengeRepository.findEndChallengesByMemberId(memberId);
+                memberChallengeRepository.findCompletedChallengesByMemberId(memberId);
 
         // 3. DTO 리스트 생성
         List<ChallengeDetail> challengeDtoList = new ArrayList<>();
