@@ -17,7 +17,7 @@ public class BadgeResponse {
     @Builder
     public static class BadgeInfo {
         private String name;
-        private Long progress;
+        private Double progress;
         private Long standard;
         private String description;
         private String image_url;

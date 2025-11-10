@@ -127,7 +127,7 @@ public class VerificationServiceImpl implements VerificationService{
                 // 진행도 업데이트
                 progress += (long) (bikeRequest.getDistance() * 1000);
                 // 기준을 넘으면 뱃지 획득 처리
-                if (progress >= requirement) {
+                if (progress >= requirement * 1000) {
                     // 뱃지 획득
                     memberBadge.acquireBadge();
                 }

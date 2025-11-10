@@ -44,7 +44,7 @@ public class BadgeServiceImpl implements BadgeService {
         List<BadgeResponse.BadgeInfo> badgeInfos = badges.stream().map(badge -> {
             // 기본 뱃지 정보 추출
             String name = badge.getBadgeName();
-            Long progress = 0L;
+            Double progress = 0d;
             Long standard = badge.getRequirement();
             String description = badge.getDescription();
             String imageUrl = badge.getImage().getImageUrl();
@@ -59,7 +59,12 @@ public class BadgeServiceImpl implements BadgeService {
                     if (!mb.getIsActive()) {
                         isAcquired = true;
                     }
-                    progress = mb.getProgress();
+                    if (mb.getBadge().getCategory() == categoryRepository.findByCategoryName(CategoryName.BIKE).orElseThrow(
+                            () -> new IllegalArgumentException("해당하는 카테고리가 없습니다."))) {
+                        progress = (double) mb.getProgress() / 1000;
+                    } else {
+                        progress = (double) mb.getProgress();
+                    }
                     createdAt = mb.getCreatedAt();
                     if (mb.getIsSelected()) {
                         isSelected = true;
