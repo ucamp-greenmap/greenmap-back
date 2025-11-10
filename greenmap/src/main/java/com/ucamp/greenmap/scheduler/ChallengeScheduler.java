@@ -22,7 +22,7 @@ public class ChallengeScheduler {
     private final MemberChallengeRepository memberChallengeRepository;
     private final ChallengeRepository challengeRepository;
 
-    @Scheduled(cron = "0 0 */6 * * *")
+    @Scheduled(cron = "0 0 */6 * * *")//0 0 */6 * * *
     public void autoCloseChallenges() {
         memberRepository.findAll().forEach(
                 member -> memberChallengeRepository.updateExpiredChallenges()
@@ -30,7 +30,7 @@ public class ChallengeScheduler {
     }
 
 
-    @Scheduled(cron = "* * */12 * * *")
+    @Scheduled(cron = "0 0 */12 * * *")
     @Transactional
     public void autoCloseChallenge() {
 //        List<Challenge> expiredChallenges = challengeRepository.findExpiredChallenges();
