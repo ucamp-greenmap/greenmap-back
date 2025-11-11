@@ -98,6 +98,7 @@ public class NewsServiceImpl implements NewsService {
         // HTML 태그 제거
         for (NewsResponse.NewsItem item : newsList) {
             item.setTitle(removeHtmlTags(item.getTitle()));
+            item.setDescription(removeHtmlTags(item.getDescription()));
         }
 
         // 로그인하지 않은 사용자일 경우 isRead 체크 없이 응답 반환
@@ -124,7 +125,7 @@ public class NewsServiceImpl implements NewsService {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
-                        .queryParam("query", "탄소 중립")
+                        .queryParam("query", "탄소중립")
                         .queryParam("display", howManyNews)
                         .build())
                 .header("X-Naver-Client-Id", clientId)
