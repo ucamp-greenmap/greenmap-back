@@ -20,7 +20,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -68,8 +67,6 @@ public class SecurityConfig {
                                 endpoint -> endpoint.baseUri("/oauth2/authorization"))
                         .redirectionEndpoint(
                                 endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler))
 
