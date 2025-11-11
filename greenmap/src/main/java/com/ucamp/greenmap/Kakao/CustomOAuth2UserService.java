@@ -38,8 +38,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                             new OAuth2Error("inactive_account", "탈퇴한 계정입니다. 로그인할 수 없습니다.", null));
                 }
                 // 활성 사용자면 그대로 반환
-                log.info("기존 카카오 사용자 로그인: kakaoId={}, memberId={}", kakaoId, member.getMemberId());
-                return new CustomOAuth2User(member, oAuth2User.getAttributes());
+//                log.info("기존 카카오 사용자 로그인: kakaoId={}, memberId={}", kakaoId, member.getMemberId());
+//                return new CustomOAuth2User(member, oAuth2User.getAttributes());
             }
 
             // 사용자가 없는 경우 (신규 회원가입) - OAuth2SuccessHandler에서 처리하도록 원본 OAuth2User 반환
