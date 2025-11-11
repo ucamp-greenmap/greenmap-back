@@ -17,7 +17,19 @@ public interface PointRepository extends JpaRepository<Point, Long> {
 
     List<Point> findTop10ByMember_IsActiveTrueOrderByMonthPointDesc();
 
-    long countByMonthPointGreaterThan(Long monthPoint);
-
-    long countByMonthPointGreaterThanAndMember_IsActiveTrue(Long monthPoint);
+    @Query(value = """
+        WITH ranked AS (
+            SELECT
+                m.member_id,
+                COALESCE(p.month_point, 0) AS month_point,
+                RANK() OVER (ORDER BY COALESCE(p.month_point, 0) DESC, m.member_id ASC) AS ranking
+            FROM member m
+            LEFT JOIN point p ON p.member_id = m.member_id
+            WHERE m.is_active = TRUE
+        )
+        SELECT ranking
+        FROM ranked
+        WHERE member_id = :memberId
+        """, nativeQuery = true)
+    Optional<Long> findMemberRank(@Param("memberId") Long memberId);
 }
