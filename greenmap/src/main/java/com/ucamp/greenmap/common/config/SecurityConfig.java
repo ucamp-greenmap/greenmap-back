@@ -58,7 +58,8 @@ public class SecurityConfig {
                                                                 "/favicon.ico",
                                                                 "/oauth2/**",
                                                                 "/login/**",
-                                                                "/login/oauth2/**")
+                                                                "/login/oauth2/**",
+                                                        "/images/**")
                                                 .permitAll()
                                                 .anyRequest().authenticated())
 
