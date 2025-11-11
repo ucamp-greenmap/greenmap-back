@@ -20,6 +20,7 @@ import com.ucamp.greenmap.point.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +57,10 @@ public class SignUpServiceImpl implements SignUpService {
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
 
         //  기본 이미지 설정
-        String defaultImage = "https://em-content.zobj.net/thumbs/120/apple/325/leaf-fluttering-in-wind_1f343.png";
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+        String defaultImage = baseUrl + "/images/defaultImg.png";
+
         String imageUrl = (request.getImageUrl() != null) ? request.getImageUrl() : defaultImage;
 
         Image image = Image.builder()
