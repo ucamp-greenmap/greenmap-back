@@ -57,9 +57,7 @@ public class SignUpServiceImpl implements SignUpService {
         String encryptedPassword = passwordEncoder.encode(request.getPassword());
 
         //  기본 이미지 설정
-
-        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
-        String defaultImage = baseUrl + "/images/defaultImg.png";
+        String defaultImage = "https://firebasestorage.googleapis.com/v0/b/green-map-83cfb.firebasestorage.app/o/user_image%2FdefaultImg.jpg?alt=media&token=44b03322-e841-4cc0-8a8a-fdd004a25494";
 
         String imageUrl = (request.getImageUrl() != null) ? request.getImageUrl() : defaultImage;
 
