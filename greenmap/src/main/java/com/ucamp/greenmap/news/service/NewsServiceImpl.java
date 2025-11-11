@@ -98,6 +98,7 @@ public class NewsServiceImpl implements NewsService {
         // HTML 태그 제거
         for (NewsResponse.NewsItem item : newsList) {
             item.setTitle(removeHtmlTags(item.getTitle()));
+            item.setDescription(removeHtmlTags(item.getDescription()));
         }
 
         // 로그인하지 않은 사용자일 경우 isRead 체크 없이 응답 반환
