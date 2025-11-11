@@ -1,6 +1,5 @@
 package com.ucamp.greenmap.common.config;
 
-import com.ucamp.greenmap.Kakao.CustomOAuth2UserService;
 import com.ucamp.greenmap.Kakao.JwtAuthenticationFilter;
 import com.ucamp.greenmap.Kakao.OAuth2FailureHandler;
 import com.ucamp.greenmap.Kakao.OAuth2SuccessHandler;
@@ -37,31 +36,32 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session.sessionFixation().newSession())
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/map/**",
-                                "/place/**",
-                                "/place",
-                                "/news/**",
-                                "/member",
-                                "/member/deactivate",
-                                "/admin",
-                                "/chalregis",
-                                "/member/check-email",
-                                "/member/check-nickname",
-                                "/member/me",
-                                "/member/login",
-                                "/member/findPw",
-                                "/member/signup",
-                                "/login/success",
-                                "/error",
-                                "/favicon.ico",
-                                "/oauth2/**",
-                                "/login/**",
-                                "/login/oauth2/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
+                            .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                "/",
+                                                                "/map/**",
+                                                                "/place/**",
+                                                                "/place",
+                                                                "/news/**",
+                                                                "/member",
+                                                                "/member/deactivate",
+                                                                "/admin",
+                                                                "/chalregis",
+                                                                "/member/check-email",
+                                                                "/member/check-nickname",
+                                                                "/member/me",
+                                                                "/member/login",
+                                                                "/member/findPw",
+                                                                "/member/signup",
+                                                                "/login/success",
+                                                                "/error",
+                                                                "/favicon.ico",
+                                                                "/oauth2/**",
+                                                                "/login/**",
+                                                                "/login/oauth2/**",
+                                                        "/images/**")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
 
                 .oauth2Login(oauth -> oauth
                         .authorizationEndpoint(
