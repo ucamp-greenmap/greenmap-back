@@ -33,7 +33,7 @@ public class MyPageServiceImpl implements MyPageService {
         MemberResponse member = memberService.getMyInfo(memberId);
         Point point = pointRepository.findByMember_MemberId(memberId).orElseThrow(
                 () -> new IllegalArgumentException("해당 멤버의 포인트 정보가 없습니다."));
-        long rank = pointRepository.countByMonthPointGreaterThan(point.getMonthPoint()) + 1;
+        long rank = pointRepository.countByMonthPointGreaterThanAndMember_IsActiveTrue(point.getMonthPoint()) + 1;
 
         MemberBadge memberBadge = memberBadgeRepository.findSelectedBadge(memberId).orElseThrow(
                 () -> new IllegalArgumentException("해당 멤버가 선택한 뱃지가 없습니다."));
