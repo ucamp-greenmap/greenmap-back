@@ -124,7 +124,7 @@ public class NewsServiceImpl implements NewsService {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
-                        .queryParam("query", "탄소 중립")
+                        .queryParam("query", "탄소중립")
                         .queryParam("display", howManyNews)
                         .build())
                 .header("X-Naver-Client-Id", clientId)
