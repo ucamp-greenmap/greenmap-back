@@ -1,11 +1,12 @@
 # 🌱 Green Map
 
-> **내 주변 친환경 시설을 한눈에 🌍**  
+ **내 주변 친환경 시설을 한눈에 🌍**  
 > 위치 기반으로 친환경 시설을 찾고,  
 > 활동 인증을 통해 포인트를 적립하며 환경을 지켜요
 
+
 🔗 **서비스 바로가기**  
-👉 https://greenmap-ucamp.netlify.app/
+👉 [Green Map](https://greenmap-ucamp.netlify.app/)
 
 ---
 
@@ -101,21 +102,22 @@
 ## 🛠 기술 스택 (Technology Stack)
 
 ### Language
-| | | |
+| 기술 | 아이콘 | 버전 |
 |-----------------|-----------------|-----------------| 
 | Java |<img src="https://cdn.iconscout.com/icon/free/png-256/free-java-60-1174953.png?f=webp" alt="JAVA" width="100">| 17.0.11 |
 
 ### Backend
-| | | | | |
+| 기술 | 아이콘 | 버전 | 기술 | 아이콘 |
 |-----------------|-----------------|-----------------|-----------------|-----------------|
 | Spring | <img src="https://blog.kakaocdn.net/dn/diVmCB/btqOcQWrLh9/K1AW5ftq5ih97pkt2rK9nk/img.png" alt="spring" width="100"> | 3.3.5 |JWT | <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8LJrZbMTtW1Hv4-ZIGC8UghRJUl8e6rzS9g&s" alt="Jwt" width="100"> | 
 | MySQL | <img src="https://rastalion.dev/wp-content/uploads/2019/04/mysql_PNG19.png" alt="mysql" width="100"> | 8.4.3 |Oauth2 | <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmrtF1vDXPOPYq-Hu1IYMf9DZReMpMte2fnw&s" alt="Oauth2" width="100"> | 
 | Google Cloud | <img src="https://www.meshcloud.io/wp-content/uploads/2022/08/googlecloud.svg" alt="gcp" width="100"> | | Docker | <img src="https://avatars.githubusercontent.com/u/5429470?s=200&v=4" alt="Docker" width="100"> |
 
 ### Collaboration
-| | | 
+| 도구 | 사용 목적 |
 |-----------------|-----------------| 
-| <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100"> | <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100"> |
+| <img src="https://github.com/user-attachments/assets/483abc38-ed4d-487c-b43a-3963b33430e6" alt="git" width="100"> |  소스 코드 관리, PR 기반 협업 |
+| <img src="https://github.com/user-attachments/assets/34141eb9-deca-416a-a83f-ff9543cc2f9a" alt="Notion" width="100"> | API 명세, 일정 관리, 회의 기록, 피드백 |
 ---
 
 ## 📁 프로젝트 구조 (Project Structure)
